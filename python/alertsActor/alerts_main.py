@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 #
-# bmo_actor.py
+# alerts_actor.py
 #
 # Created by José Sánchez-Gallego on 16 Feb 2017.
 
@@ -26,18 +26,21 @@ from alertsActor import __version__
 from alertsActor.cmds.cmd_parser import alerts_parser
 from alertsActor.logger import log
 
+from alertsActor.rules import callbacks 
 
 
 class alertsActor(BaseActor):
-    """the actual actor!"""
+    """the actor"""
 
     def __init__(self, config, **kwargs):
 
         self.cmdParser = alerts_parser
         self.config = config
 
-        self.hubConnection = self.connectHub('localhost', datamodel_casts: {actor.keyword: int/fn}, datamodel_callbacks: {actor.keyword: fn})
-
+        # keeps a running data model of keywords coming from the hub
+        # allows callbacks on updates
+        self.dataModel = self.connectHub('localhost', datamodel_casts: {actor.keyword: int/fn}, 
+                                                      datamodel_callbacks: callbacks.datamodel_callbacks)
 
         log.info('starting alertsActor actor version={!r} in port={}'
                  .format(__version__, kwargs['userPort']))
@@ -97,3 +100,29 @@ class alertsActor(BaseActor):
         except BaseException:
             # This catches the SystemExit that Click insists in returning.
             pass
+
+
+class alert(object):
+    '''The basic alert. It knows when it was created, what triggered it,
+    
+    whether its been acknowledged, whether the condition that triggered it has gone away, etc.
+
+    '''
+
+    def __init__(self, name, cause):
+        self.name = name
+        self.triggeredTime = time.time()
+        self.causeString = cause 
+        self.active = True
+        self.acknowledged = False
+        self.acknowledgeMsg = None
+
+        self.checkMe = Timer()
+
+
+    def acknowledge(self, msg=None):
+        if msg is not None:
+            self.acknowledgeMsg = msg
+
+        self.acknowledged = True
+
