@@ -1,41 +1,35 @@
-# encoding: utf-8
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
+# BMO uses pathlib2 in python 2, in preparation to become python3-only.
+try:
+    import pathlib
+except ImportError:
+    import pathlib2 as pathlib
 
-import os
 import yaml
 
-# Inits the logging system. Only shell logging, and exception and warning catching.
-# File logging can be started by calling log.start_file_logger(name).
-from .misc import log
+
+# Monkeypatches formatwarning and error handling
+
+import click
+import warnings
 
 
-def merge(user, default):
-    """Merges a user configuration with the default one."""
+def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
 
-    if isinstance(user, dict) and isinstance(default, dict):
-        for kk, vv in default.items():
-            if kk not in user:
-                user[kk] = vv
-            else:
-                user[kk] = merge(user[kk], vv)
+    basename = pathlib.Path(filename).name
+    category_colour = click.style('[{}]'.format(category.__name__), fg='yellow')
 
-    return user
+    return '{}: {} ({}:{})\n'.format(category_colour, message, basename, lineno)
 
 
-NAME = 'alertsActor'
+warnings.formatwarning = warning_on_one_line
+
+warnings.filterwarnings(
+    'ignore', 'Matplotlib is building the font cache using fc-list. This may take a moment.')
 
 
 # Loads config
-config = yaml.load(open(os.path.dirname(__file__) + '/etc/{0}.yml'.format(NAME)))
-
-# If there is a custom configuration file, updates the defaults using it.
-custom_config_fn = os.path.expanduser('~/.{0}/{0}.yml'.format(NAME))
-if os.path.exists(custom_config_fn):
-    config = merge(yaml.load(open(custom_config_fn)), config)
+config = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/toy.cfg')))
 
 
-__version__ = '0.1.0dev'
+__version__ = '0.0.1'
