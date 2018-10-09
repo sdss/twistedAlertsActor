@@ -11,9 +11,9 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import click
-from alerts_actor.cmds import alerts_context
+from alertsActor.cmds import alerts_context
 
-from alerts_actor import __version__
+from alertsActor import __version__
 
 
 __all__ = ('version')

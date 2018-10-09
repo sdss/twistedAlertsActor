@@ -24,7 +24,7 @@ import warnings
 from logging.handlers import TimedRotatingFileHandler
 # from textwrap import TextWrapper
 
-from toy import config, pathlib
+from alertsActor import config, pathlib
 
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name

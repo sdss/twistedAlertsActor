@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf-8
 #
-# alerts_actor.py
+# alerts_main.py
 #
-# Created by José Sánchez-Gallego on 16 Feb 2017.
+
 
 
 from __future__ import division
@@ -37,10 +37,8 @@ class alertsActor(BaseActor):
         self.cmdParser = alerts_parser
         self.config = config
 
-        # keeps a running data model of keywords coming from the hub
-        # allows callbacks on updates
-        self.dataModel = self.connectHub('localhost', datamodel_casts: {actor.keyword: int/fn}, 
-                                                      datamodel_callbacks: callbacks.datamodel_callbacks)
+        self.connectHub('localhost', datamodel_casts=callbacks.datamodel_casts, 
+                                                      datamodel_callbacks=callbacks.datamodel_callbacks)
 
         log.info('starting alertsActor actor version={!r} in port={}'
                  .format(__version__, kwargs['userPort']))
@@ -50,6 +48,18 @@ class alertsActor(BaseActor):
         # Sets itself as the default actor to write to when logging.
         log.set_actor(self)
 
+
+    @property
+    def dataModel(self):
+        # keeps a running data model of keywords coming from the hub
+        # allows callbacks on updates
+
+        # this may need to be more careful... test! 
+        if self.hub is None:
+            self.connectHub('localhost', datamodel_casts=callbacks.datamodel_casts, 
+                                         datamodel_callbacks=callbacks.datamodel_callbacks)
+
+        return self.hub.datamodel
 
     def parseAndDispatchCmd(self, cmd):
         """Dispatch the user command."""

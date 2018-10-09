@@ -16,7 +16,7 @@ from twisted.internet import reactor
 
 from alertsActor import config, __version__
 from alertsActor.logger import log
-from alertsActor.toy_main import alertsActor
+from alertsActor.alerts_main import alertsActor
 
 import click
 

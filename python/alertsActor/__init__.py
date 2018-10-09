@@ -29,7 +29,7 @@ warnings.filterwarnings(
 
 
 # Loads config
-config = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/toy.cfg')))
+config = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alerts.cfg')))
 
 
 __version__ = '0.0.1'
