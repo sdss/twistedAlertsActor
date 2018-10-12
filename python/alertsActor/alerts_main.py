@@ -26,7 +26,7 @@ from alertsActor import __version__
 from alertsActor.cmds.cmd_parser import alerts_parser
 from alertsActor.logger import log
 
-from alertsActor.rules import callbacks 
+from alertsActor.rules import callbackWrapper
 
 
 class alertsActor(BaseActor):
@@ -37,8 +37,10 @@ class alertsActor(BaseActor):
         self.cmdParser = alerts_parser
         self.config = config
 
-        self.connectHub('localhost', datamodel_casts=callbacks.datamodel_casts, 
-                                                      datamodel_callbacks=callbacks.datamodel_callbacks)
+        self.callbacks = callbackWrapper.wrapCallbacks(self, keywords)
+
+        self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts, 
+                                     datamodel_callbacks=self.callbacks.datamodel_callbacks)
 
         log.info('starting alertsActor actor version={!r} in port={}'
                  .format(__version__, kwargs['userPort']))
@@ -47,6 +49,13 @@ class alertsActor(BaseActor):
 
         # Sets itself as the default actor to write to when logging.
         log.set_actor(self)
+
+        # might as well just increment it right? 
+        self.alertIDcounter = 0
+        self.alerts = dict()
+
+        # keep track of heartbeats
+        self.heartbeats = dict()
 
 
     @property
@@ -60,6 +69,13 @@ class alertsActor(BaseActor):
                                          datamodel_callbacks=callbacks.datamodel_callbacks)
 
         return self.hub.datamodel
+
+
+    def raiseAlert(cause, severity):
+        # raise an alert and add it to the actors alerts
+        self.alerts[self.alertIDcounter] = alert(cause, severity)
+        self.alertIDcounter += 1
+
 
     def parseAndDispatchCmd(self, cmd):
         """Dispatch the user command."""
@@ -119,8 +135,7 @@ class alert(object):
 
     '''
 
-    def __init__(self, name, cause):
-        self.name = name
+    def __init__(self, cause, severity):
         self.triggeredTime = time.time()
         self.causeString = cause 
         self.active = True

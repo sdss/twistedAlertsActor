@@ -6,8 +6,17 @@
 # Created by John Donor on 17 Sep 2018.
 
 
+from alertsActor.rules import pass_actor
+
 # define new behavior for problems below
 # will need to define one for each in callbacks
+
+@pass_actor
+def pulse(actor, key):
+    '''updates the heartbeat for an actor'''
+    # print(key)
+    # heartbeats[actor] = time.time()
+    print('pulsing!', actor, key)
 
 def tempAlarms(key):
     if key:
