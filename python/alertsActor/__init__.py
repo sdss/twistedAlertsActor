@@ -31,5 +31,6 @@ warnings.filterwarnings(
 # Loads config
 config = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alerts.cfg')))
 
+alertActions = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alertActions.yml')))
 
 __version__ = '0.0.1'

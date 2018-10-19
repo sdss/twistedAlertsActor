@@ -15,6 +15,7 @@ import click
 from alertsActor.cmds.help import help
 from alertsActor.cmds.ping import ping
 from alertsActor.cmds.version import version
+from alertsActor.cmds.status import status
 
 
 __all__ = ('alerts_parser')
@@ -29,6 +30,7 @@ def alerts_parser(ctx):
 alerts_parser.add_command(help)
 alerts_parser.add_command(ping)
 alerts_parser.add_command(version)
+alerts_parser.add_command(status)
 
 
 if __name__ == '__main__':

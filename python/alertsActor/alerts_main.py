@@ -11,6 +11,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import json
+import yaml
 import sys
 import traceback
 
@@ -22,7 +23,7 @@ from RO.StringUtil import strFromException
 from RO.Comm.TwistedTimer import Timer
 from twistedActor import BaseActor, CommandError, UserCmd
 
-from alertsActor import __version__
+from alertsActor import __version__, alertActions
 from alertsActor.cmds.cmd_parser import alerts_parser
 from alertsActor.logger import log
 
@@ -37,7 +38,7 @@ class alertsActor(BaseActor):
         self.cmdParser = alerts_parser
         self.config = config
 
-        self.callbacks = callbackWrapper.wrapCallbacks(self, keywords)
+        self.callbacks = callbackWrapper.wrapCallbacks(self, alertActions)
 
         self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts, 
                                      datamodel_callbacks=self.callbacks.datamodel_callbacks)
@@ -59,14 +60,24 @@ class alertsActor(BaseActor):
 
 
     @property
+    def activeAlerts(self):
+        active = []
+        for k, a in self.alerts.items():
+            if a.active:
+                active.append(a)
+
+        return active
+
+
+    @property
     def dataModel(self):
         # keeps a running data model of keywords coming from the hub
         # allows callbacks on updates
 
         # this may need to be more careful... test! 
         if self.hub is None:
-            self.connectHub('localhost', datamodel_casts=callbacks.datamodel_casts, 
-                                         datamodel_callbacks=callbacks.datamodel_callbacks)
+            self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts, 
+                                         datamodel_callbacks=self.callbacks.datamodel_callbacks)
 
         return self.hub.datamodel
 

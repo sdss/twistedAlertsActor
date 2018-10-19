@@ -1,0 +1,11 @@
+# this file specifies what actor/key pairs raise alerts
+# the actor and key are specified as actor.key
+# for each actor/key, an [action, cast] must be specified
+# actions are pulse, warning, severe, critical
+# casts are how to cast each keyword (e.g. int, str)
+apogee.ditherPosition: [pulse, str]
+apogee.tempAlarms: [warning, str]
+apogee.vacuumAlarm: [warning, str]
+apogee.ln2Alarm: [warning, str]
+apogee.collIndexer: [warning, str]
+apogee.ditherIndexer: [warning, str]

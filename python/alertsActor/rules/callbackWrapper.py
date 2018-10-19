@@ -24,10 +24,11 @@ class wrapCallbacks(object):
         translate = {"pulse": self.pulse,
                      "warning": self.warning,
                      "severe": self.severe,
-                     "critical", self.critical,
+                     "critical": self.critical,
                      "str": str}
 
         for k, v in keywords.items():
+            assert len(v) == 2, 'must specify an alert action and cast for {}'.format(k)
             datamodel_casts[k] = translate[v[0]]
             datamodel_callbacks[k] = translate[v[1]]
 
@@ -36,6 +37,7 @@ class wrapCallbacks(object):
         """Update the heartbeat for a specified actor
         """
         self.alertsActor.heartbeats['actor'] = time.time()
+        print('pulse')
 
 
     def warning(self, key):
