@@ -38,6 +38,8 @@ class alertsActor(BaseActor):
         self.cmdParser = alerts_parser
         self.config = config
 
+        super(alertsActor, self).__init__(**kwargs)
+
         self.callbacks = callbackWrapper.wrapCallbacks(self, alertActions)
 
         self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts, 
@@ -45,8 +47,6 @@ class alertsActor(BaseActor):
 
         log.info('starting alertsActor actor version={!r} in port={}'
                  .format(__version__, kwargs['userPort']))
-
-        super(alertsActor, self).__init__(**kwargs)
 
         # Sets itself as the default actor to write to when logging.
         log.set_actor(self)
@@ -76,6 +76,7 @@ class alertsActor(BaseActor):
 
         # this may need to be more careful... test! 
         if self.hub is None:
+            print("no hub connection, reconnecting!")
             self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts, 
                                          datamodel_callbacks=self.callbacks.datamodel_callbacks)
 

@@ -20,17 +20,17 @@ class wrapCallbacks(object):
         self.datamodel_casts = dict()
         self.datamodel_callbacks = dict()
 
-        # this feels clumsy, but it works...
+        # this feels clumsy, but it should work...
         translate = {"pulse": self.pulse,
                      "warning": self.warning,
-                     "severe": self.severe,
+                     "serious": self.serious,
                      "critical": self.critical,
                      "str": str}
 
         for k, v in keywords.items():
             assert len(v) == 2, 'must specify an alert action and cast for {}'.format(k)
-            datamodel_casts[k] = translate[v[0]]
-            datamodel_callbacks[k] = translate[v[1]]
+            self.datamodel_casts[k] = translate[v[0]]
+            self.datamodel_callbacks[k] = translate[v[1]]
 
 
     def pulse(self, actor):
@@ -47,10 +47,10 @@ class wrapCallbacks(object):
         # print some stuff?
 
 
-    def severe(self, key):
-        """Raise a severe alert
+    def serious(self, key):
+        """Raise a serious alert
         """
-        self.alertsActor.raiseAlert(name, cause, "severe")
+        self.alertsActor.raiseAlert(name, cause, "serious")
 
 
     def critical(self, key):
