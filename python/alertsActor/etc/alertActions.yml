@@ -3,9 +3,22 @@
 # for each actor/key, an [cast, action] must be specified
 # actions are pulse, warning, severe, critical
 # casts are how to cast each keyword (e.g. int, str)
-apogee.ditherPosition: [str, pulse]
-apogee.tempAlarms: [str, warning]
-apogee.vacuumAlarm: [str, warning]
-apogee.ln2Alarm: [str, warning]
-apogee.collIndexer: [str, warning]
-apogee.ditherIndexer: [str, warning]
+apogee.ditherPosition: 
+  cast: str
+  action: pulse
+  actor: apogee
+apogee.tempAlarms: 
+  cast: str
+  action: warning
+apogee.vacuumAlarm: 
+  cast: str
+  action: warning
+apogee.ln2Alarm: 
+  cast: str
+  action: warning
+apogee.collIndexer: 
+  cast: str
+  action: warning
+apogee.ditherIndexer: 
+  cast: str
+  action: warning

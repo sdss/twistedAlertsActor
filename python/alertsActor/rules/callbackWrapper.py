@@ -9,6 +9,37 @@ import time
 from alertsActor.rules import apogee
 
 
+def parseAndPassArgs(wrapper, keywords):
+    """remove 'cast' and action from 'args' list
+       execute relevant args to function
+       necessary to delay evaluation of function, I think
+    """
+    passedArgs = {k: keywords[k] for k in keywords.keys() if k not in ('cast', 'action')}
+    # return fn(**passedArgs)
+
+    # this feels clumsy, but it should work...
+    translate = {"pulse": wrapper.pulse,
+                 "warning": wrapper.warning,
+                 "serious": wrapper.serious,
+                 "critical": wrapper.critical,
+                 "str": str}
+
+    print("parsing: ", keywords)
+    # print(translate[keywords['cast']], translate[keywords['action']](**passedArgs))
+
+    cast = translate[keywords['cast']]
+
+    # when callback is called, it is given an argument. maybe ask Jose?
+    # meanwhile: "_" means expect a variable, and implicitly ignore it, more or less
+    # so this line defines an anonomymous function that is a copy of keywords['action']
+    # with the appropriate **kwargs, that can be called as needed
+    callback = lambda _: translate[keywords['action']](**passedArgs)
+
+    print(cast, callback)
+
+    return cast, callback
+
+
 class wrapCallbacks(object):
     """Lets try this. Pass in keywords read from a file
        along with their alert type. 
@@ -20,40 +51,34 @@ class wrapCallbacks(object):
         self.datamodel_casts = dict()
         self.datamodel_callbacks = dict()
 
-        # this feels clumsy, but it should work...
-        translate = {"pulse": self.pulse,
-                     "warning": self.warning,
-                     "serious": self.serious,
-                     "critical": self.critical,
-                     "str": str}
-
         for k, v in keywords.items():
-            assert len(v) == 2, 'must specify an alert action and cast for {}'.format(k)
-            self.datamodel_casts[k] = translate[v[0]]
-            self.datamodel_callbacks[k] = translate[v[1]]
+            assert len(v) >= 2, 'must specify an alert action and cast for {}'.format(k)
+            # self.datamodel_casts[k] = translate[v['cast']]
+            # self.datamodel_callbacks[k] = lambda: parseAndPassArgs(translate[v['action']], v)
+            self.datamodel_callbacks[k], self.datamodel_casts[k] = parseAndPassArgs(self, v)
 
 
-    def pulse(self, actor):
+    def pulse(self, actor='NOT_SPECIFIED'):
         """Update the heartbeat for a specified actor
         """
-        self.alertsActor.heartbeats['actor'] = time.time()
-        print('pulse')
+        self.alertsActor.heartbeats[actor] = time.time()
+        print('pulsing {}, time {}'.format(actor, self.alertsActor.heartbeats[actor]))
 
 
-    def warning(self, key):
+    def warning(self):
         """Raise a warning alert
         """
         self.alertsActor.raiseAlert(name, cause, "warning")
         # print some stuff?
 
 
-    def serious(self, key):
+    def serious(self):
         """Raise a serious alert
         """
         self.alertsActor.raiseAlert(name, cause, "serious")
 
 
-    def critical(self, key):
+    def critical(self):
         """Raise a critical alert
         """
         self.alertsActor.raiseAlert(name, cause, "critical")
