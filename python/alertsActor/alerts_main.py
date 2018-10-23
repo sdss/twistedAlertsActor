@@ -5,7 +5,6 @@
 #
 
 
-
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
@@ -83,10 +82,36 @@ class alertsActor(BaseActor):
         return self.hub.datamodel
 
 
-    def raiseAlert(cause, severity):
-        # raise an alert and add it to the actors alerts
-        self.alerts[self.alertIDcounter] = alert(cause, severity)
+    def dispatchAlertMessage(msg, severity='info'):
+        # write an alert to users
+        if severity == 'critical':
+            broadcastSeverity = 'e'
+        elif severity == 'warning' or severity == 'serious':
+            broadcastSeverity = 'w'
+        else:
+            broadcastSeverity = 'i'
+
+        self.writeToUsers(broadcastSeverity, msg)
+
+
+    def evaluateAlert(thisAlert):
+        if not thisAlert.acknowledged:
+            dispatchAlertMessage(thisAlert.msg, severity=thisAlert.severity)
+
+        # some other stuff, elevate priorities? etc
+
+
+    def raiseAlert(actorKey='oop.forgot', cause='idk', severity='info', **kwargs):
+        # raise an alert and add it to the actors alerts 
+        
+        self.alerts[self.alertIDcounter] = alert(ID=self.alertIDcounter, actorKey=actorKey, 
+                                                 cause=cause, severity=severity, **kwargs)
+        thisAlert = self.alerts[self.alertIDcounter]
         self.alertIDcounter += 1
+
+        dispatchAlertMessage(thisAlert.msg, severity=severity)
+
+        thisAlert.checkMe.start(600, lambda _: evaluateAlert(thisAlert))
 
 
     def parseAndDispatchCmd(self, cmd):
@@ -147,14 +172,19 @@ class alert(object):
 
     '''
 
-    def __init__(self, cause, severity):
+    def __init__(self, ID=-1, actorKey='oop.forgot', cause='idk', severity='info', **kwargs):
+        self.id = ID
         self.triggeredTime = time.time()
+        self.actorKey = actorKey
         self.causeString = cause 
         self.active = True
         self.acknowledged = False
         self.acknowledgeMsg = None
 
         self.checkMe = Timer()
+
+        self.msg = "alert={actorKey}, {id}, {severity}, {other}".format(actorKey=actorKey,
+                    id=self.ID, severity=severity, other='otherstuff')
 
 
     def acknowledge(self, msg=None):

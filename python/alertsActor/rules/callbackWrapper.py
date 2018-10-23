@@ -6,7 +6,7 @@
 # Created by John Donor on 9 Mar 2018.
 
 import time
-from alertsActor.rules import apogee
+from RO.Comm.TwistedTimer import Timer
 
 
 def parseAndPassArgs(wrapper, keywords):
@@ -24,9 +24,6 @@ def parseAndPassArgs(wrapper, keywords):
                  "critical": wrapper.critical,
                  "str": str}
 
-    print("parsing: ", keywords)
-    # print(translate[keywords['cast']], translate[keywords['action']](**passedArgs))
-
     cast = translate[keywords['cast']]
 
     # when callback is called, it is given an argument. maybe ask Jose?
@@ -35,9 +32,9 @@ def parseAndPassArgs(wrapper, keywords):
     # with the appropriate **kwargs, that can be called as needed
     callback = lambda _: translate[keywords['action']](**passedArgs)
 
-    print(cast, callback)
+    print(keywords, cast, str)
 
-    return cast, callback
+    return callback, cast
 
 
 class wrapCallbacks(object):
@@ -58,45 +55,37 @@ class wrapCallbacks(object):
             self.datamodel_callbacks[k], self.datamodel_casts[k] = parseAndPassArgs(self, v)
 
 
-    def pulse(self, actor='NOT_SPECIFIED'):
+    def pulse(self, actor='NOT_SPECIFIED', checkAfter=30):
         """Update the heartbeat for a specified actor
         """
-        self.alertsActor.heartbeats[actor] = time.time()
+        if actor not in self.alertsActor.heartbeats.keys():
+            self.alertsActor.heartbeats[actor] = Timer()
+        self.alertsActor.heartbeats[actor].start(checkAfter, lambda: self.itsDeadJim(actor=actor))
         print('pulsing {}, time {}'.format(actor, self.alertsActor.heartbeats[actor]))
 
 
-    def warning(self):
+    def warning(self, **kwargs):
         """Raise a warning alert
         """
-        self.alertsActor.raiseAlert(name, cause, "warning")
+        self.alertsActor.raiseAlert(actorKey=actorKey, severity="warning", **kwargs)
         # print some stuff?
 
 
-    def serious(self):
+    def serious(self, **kwargs):
         """Raise a serious alert
         """
-        self.alertsActor.raiseAlert(name, cause, "serious")
+        self.alertsActor.raiseAlert(actorKey=actorKey, severity="serious", **kwargs)
 
 
-    def critical(self):
+    def critical(self, **kwargs):
         """Raise a critical alert
         """
-        self.alertsActor.raiseAlert(name, cause, "critical")
+        self.alertsActor.raiseAlert(actorKey=actorKey, severity="critical", **kwargs)
         # EMAIL EVERYBODY!!
         # make noise?
 
-# e.g.
-datamodel_callbacks = {"apogee.ditherPosition": apogee.pulse,  # used for heartbeat  # "apogee"
-                       "apogee.tempAlarms": apogee.tempAlarms,  # "key"
-                       "apogee.vacuumAlarm": apogee.vacuumAlarm,  # "key"
-                       "apogee.ln2Alarm": apogee.ln2Alarm,  # "key"
-                       "apogee.collIndexer": apogee.collIndexer,  # "key"
-                       "apogee.ditherIndexer": apogee.ditherIndexer,}  # "key"
-# probably more
+    def itsDeadJim(self, actor='NOT_SPECIFIED'):
+        actorKey = actor+".heartbeat"
+        print("its dead its dead!!! {}".format(actorKey))
+        self.alertsActor.raiseAlert(actorKey=actorKey, severity="warning")
 
-datamodel_casts = {"apogee.ditherPosition": str,  # used for heartbeat  # "apogee"
-                   "apogee.tempAlarms": str,  # "key"
-                   "apogee.vacuumAlarm": str,  # "key"
-                   "apogee.ln2Alarm": str,  # "key"
-                   "apogee.collIndexer": str,  # "key"
-                   "apogee.ditherIndexer": str,}  # "key"
