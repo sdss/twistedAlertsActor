@@ -3,22 +3,23 @@
 # for each actor/key, an [cast, action] must be specified
 # actions are pulse, warning, severe, critical
 # casts are how to cast each keyword (e.g. int, str)
+# the extra !!python/etc... is to read it in as a function
 apogee.ditherPosition: 
-  cast: str
-  action: pulse
-  actor: apogee
+  cast: !!python/name:__builtin__.str
+  severity: warning
+  heartbeat: apogee
 apogee.tempAlarms: 
-  cast: str
-  action: warning
+  cast: !!python/name:__builtin__.str
+  severity: warning
 apogee.vacuumAlarm: 
-  cast: str
-  action: warning
+  cast: !!python/name:__builtin__.str
+  severity: warning
 apogee.ln2Alarm: 
-  cast: str
-  action: warning
+  cast: !!python/name:__builtin__.str
+  severity: warning
 apogee.collIndexer: 
-  cast: str
-  action: warning
+  cast: !!python/name:__builtin__.str
+  severity: warning
 apogee.ditherIndexer: 
-  cast: str
-  action: warning
+  cast: !!python/name:__builtin__.str
+  severity: warning

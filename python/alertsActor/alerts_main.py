@@ -39,6 +39,12 @@ class alertsActor(BaseActor):
 
         super(alertsActor, self).__init__(**kwargs)
 
+        # a dictionary of actor keys we're watching
+        self.monitoring = dict()
+
+        # keep track of heartbeats
+        self.heartbeats = dict()
+
         self.callbacks = callbackWrapper.wrapCallbacks(self, alertActions)
 
         self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts, 
@@ -50,18 +56,15 @@ class alertsActor(BaseActor):
         # Sets itself as the default actor to write to when logging.
         log.set_actor(self)
 
-        # might as well just increment it right? 
-        self.alertIDcounter = 0
-        self.alerts = dict()
 
-        # keep track of heartbeats
-        self.heartbeats = dict()
+    def addKey(self, key, severity, **kwargs):
+        self.monitoring[key] = keyState(self, actorKey=key, severity=severity, **kwargs)
 
 
     @property
     def activeAlerts(self):
         active = []
-        for k, a in self.alerts.items():
+        for k, a in self.monitoring.items():
             if a.active:
                 active.append(a)
 
@@ -69,7 +72,7 @@ class alertsActor(BaseActor):
 
 
     @property
-    def dataModel(self):
+    def hubModel(self):
         # keeps a running data model of keywords coming from the hub
         # allows callbacks on updates
 
@@ -82,40 +85,23 @@ class alertsActor(BaseActor):
         return self.hub.datamodel
 
 
-    def dispatchAlertMessage(msg, severity='info'):
-        # write an alert to users
-        if severity == 'critical':
-            broadcastSeverity = 'e'
-        elif severity == 'warning' or severity == 'serious':
-            broadcastSeverity = 'w'
+    def checkKey(self, actorKey):
+        # update to datamodel, what do?
+        actor, keyword = actorKey.split('.')
+        key = self.hubModel[actor][keyword]
+        if key == self.monitoring[actorKey].dangerVal:
+            if self.monitoring[actorKey].active:
+                # we already know
+                return None
+            else:
+                self.monitoring[actorKey].setActive()
         else:
-            broadcastSeverity = 'i'
-
-        self.writeToUsers(broadcastSeverity, msg)
-
-
-    def evaluateAlert(thisAlert):
-        if not thisAlert.acknowledged:
-            dispatchAlertMessage(thisAlert.msg, severity=thisAlert.severity)
-
-        # some other stuff, elevate priorities? etc
-
-
-    def raiseAlert(actorKey='oop.forgot', cause='idk', severity='info', **kwargs):
-        # raise an alert and add it to the actors alerts 
-        
-        self.alerts[self.alertIDcounter] = alert(ID=self.alertIDcounter, actorKey=actorKey, 
-                                                 cause=cause, severity=severity, **kwargs)
-        thisAlert = self.alerts[self.alertIDcounter]
-        self.alertIDcounter += 1
-
-        dispatchAlertMessage(thisAlert.msg, severity=severity)
-
-        thisAlert.checkMe.start(600, lambda _: evaluateAlert(thisAlert))
+            # if they changed and its good, then the alert is gone, right?
+            self.monitoring[actorKey].resolve()
 
 
     def parseAndDispatchCmd(self, cmd):
-        """Dispatch the user command."""
+        """Dispatch the user command. Stolen from BMO."""
 
         def test_cmd(args):
             result = CliRunner().invoke(alerts_parser, args)
@@ -165,31 +151,65 @@ class alertsActor(BaseActor):
             pass
 
 
-class alert(object):
-    '''The basic alert. It knows when it was created, what triggered it,
-    
-    whether its been acknowledged, whether the condition that triggered it has gone away, etc.
+class keyState(object):
+    '''Keep track of the state of each actor.key'''
 
-    '''
-
-    def __init__(self, ID=-1, actorKey='oop.forgot', cause='idk', severity='info', **kwargs):
-        self.id = ID
-        self.triggeredTime = time.time()
+    def __init__(self, alertsActor, actorKey='oop.forgot', severity='info', dangerVal=None,
+                 defaultMsg=''):
+        self.alertsActorReference = alertsActor
+        self.triggeredTime = None
         self.actorKey = actorKey
-        self.causeString = cause 
-        self.active = True
+        self.active = False
+        self.defaultSeverity = severity
+        self.severity = 'info'
         self.acknowledged = False
         self.acknowledgeMsg = None
-
+        self.dangerVal = dangerVal  # value on which to raise alert
         self.checkMe = Timer()
+        self.defaultMsg = defaultMsg  # message to send user with alert
+        self.msg = "all good"  # formatted message, "all good" should never be sent
 
-        self.msg = "alert={actorKey}, {id}, {severity}, {other}".format(actorKey=actorKey,
-                    id=self.ID, severity=severity, other='otherstuff')
+
+    def setActive(self):
+        # something cause a problem, do stuff
+        self.active = True
+        self.severity = self.defaultSeverity
+        self.triggeredTime = time.time()
+        self.checkMe.start(600, self.reevaluate)
+
+        self.msg = "alert={actorKey}, {severity}, {other}".format(actorKey=self.actorKey,
+                    severity=self.severity, other='otherstuff')
+
+        self.dispatchAlertMessage(self.msg, severity=self.severity)
+
+
+    def resolve(self):
+        # everything good, back to normal
+        self.active = False
+        self.checkMe = Timer()
+        self.severity = 'info'
 
 
     def acknowledge(self, msg=None):
         if msg is not None:
-            self.acknowledgeMsg = msg
+            self.acknowledgeMsg += msg + "\n" # so we can add many... I guess?
 
         self.acknowledged = True
 
+
+    def reevaluate(self):
+        if not self.acknowledged:
+            self.dispatchAlertMessage(self.msg, severity=self.severity)
+            self.checkMe.start(600, self.reevaluate)
+
+
+    def dispatchAlertMessage(self, msg, severity='info'):
+        # write an alert to users
+        if severity == 'critical':
+            broadcastSeverity = 'e'
+        elif severity == 'warning' or severity == 'serious':
+            broadcastSeverity = 'w'
+        else:
+            broadcastSeverity = 'i'
+
+        self.alertsActorReference.writeToUsers(broadcastSeverity, msg)

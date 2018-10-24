@@ -26,4 +26,4 @@ def ping(actor, cmd):
     cmd.setState(cmd.Done, "I'm not dead yet!")
     print(actor.heartbeats)
 
-    # return False
+    return False

@@ -9,83 +9,54 @@ import time
 from RO.Comm.TwistedTimer import Timer
 
 
-def parseAndPassArgs(wrapper, keywords):
-    """remove 'cast' and action from 'args' list
-       execute relevant args to function
-       necessary to delay evaluation of function, I think
-    """
-    passedArgs = {k: keywords[k] for k in keywords.keys() if k not in ('cast', 'action')}
-    # return fn(**passedArgs)
-
-    # this feels clumsy, but it should work...
-    translate = {"pulse": wrapper.pulse,
-                 "warning": wrapper.warning,
-                 "serious": wrapper.serious,
-                 "critical": wrapper.critical,
-                 "str": str}
-
-    cast = translate[keywords['cast']]
-
-    # when callback is called, it is given an argument. maybe ask Jose?
-    # meanwhile: "_" means expect a variable, and implicitly ignore it, more or less
-    # so this line defines an anonomymous function that is a copy of keywords['action']
-    # with the appropriate **kwargs, that can be called as needed
-    callback = lambda _: translate[keywords['action']](**passedArgs)
-
-    print(keywords, cast, str)
-
-    return callback, cast
-
-
 class wrapCallbacks(object):
     """Lets try this. Pass in keywords read from a file
        along with their alert type. 
     """
 
     def __init__(self, alertsActor, keywords):
-        # keywords of the form {key: (cast, action)}
+        # keywords read from config
         self.alertsActor = alertsActor
         self.datamodel_casts = dict()
         self.datamodel_callbacks = dict()
 
-        for k, v in keywords.items():
-            assert len(v) >= 2, 'must specify an alert action and cast for {}'.format(k)
-            # self.datamodel_casts[k] = translate[v['cast']]
-            # self.datamodel_callbacks[k] = lambda: parseAndPassArgs(translate[v['action']], v)
-            self.datamodel_callbacks[k], self.datamodel_casts[k] = parseAndPassArgs(self, v)
+        for key, actions in keywords.items():
+            self.datamodel_casts[key] = actions['cast']
+
+            initKeys = ('cast', 'severity', 'heartbeat')
+
+            otherArgs = {k: actions[k] for k in actions.keys() if k not in initKeys}
+
+            if 'heartbeat' in actions.keys():
+                alertKey = actions['heartbeat'] + '.hearbeat'
+                callback = lambda _: self.pulse(actorKey=alertKey)
+                self.datamodel_callbacks[key] = callback
+                # print(key, actions, alertKey)
+
+            else:
+                alertKey = key
+                callback = lambda _: self.updateKey(key)
+                self.datamodel_callbacks[key] = callback
+                # print(key, actions, alertKey)
+
+            self.alertsActor.addKey(alertKey, severity=actions['severity'], **otherArgs)
 
 
-    def pulse(self, actor='NOT_SPECIFIED', checkAfter=30):
+    def pulse(self, actorKey='NOT_SPECIFIED', checkAfter=30):
         """Update the heartbeat for a specified actor
         """
-        if actor not in self.alertsActor.heartbeats.keys():
-            self.alertsActor.heartbeats[actor] = Timer()
-        self.alertsActor.heartbeats[actor].start(checkAfter, lambda: self.itsDeadJim(actor=actor))
-        print('pulsing {}, time {}'.format(actor, self.alertsActor.heartbeats[actor]))
+        if actorKey not in self.alertsActor.heartbeats.keys():
+            self.alertsActor.heartbeats[actorKey] = Timer()
+
+        self.alertsActor.heartbeats[actorKey].start(checkAfter, lambda: self.itsDeadJim(alertKey=actorKey))
+        print('pulsing {}, time {}'.format(actorKey, time.time()))
 
 
-    def warning(self, **kwargs):
-        """Raise a warning alert
-        """
-        self.alertsActor.raiseAlert(actorKey=actorKey, severity="warning", **kwargs)
-        # print some stuff?
+    def updateKey(self, key):
+        self.alertsActor.checkKey(key)
 
 
-    def serious(self, **kwargs):
-        """Raise a serious alert
-        """
-        self.alertsActor.raiseAlert(actorKey=actorKey, severity="serious", **kwargs)
-
-
-    def critical(self, **kwargs):
-        """Raise a critical alert
-        """
-        self.alertsActor.raiseAlert(actorKey=actorKey, severity="critical", **kwargs)
-        # EMAIL EVERYBODY!!
-        # make noise?
-
-    def itsDeadJim(self, actor='NOT_SPECIFIED'):
-        actorKey = actor+".heartbeat"
-        print("its dead its dead!!! {}".format(actorKey))
-        self.alertsActor.raiseAlert(actorKey=actorKey, severity="warning")
+    def itsDeadJim(self, alertKey='NOT_SPECIFIED'):
+        print("its dead its dead!!! {}".format(alertKey))
+        self.alertsActor.monitoring[alertKey].setActive()
 
