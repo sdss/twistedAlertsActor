@@ -18,15 +18,26 @@ __all__ = ('acknowledge')
 
 
 @click.command()
-@click.option('--alertKey', default=None, help='which actor.key to acknowledge.')
-@click.option('--severity', default='i', help='the severity to acknowledge.')
+@click.argument('alertkey', nargs=1, default=None, required=True)
+@click.argument('severity', nargs=1, default='info', 
+                type=click.Choice(['info', 'warning', 'serious', 'critical']))
+@click.option('-m', '--message', multiple=True, default=None, help='a short message to hang on to')
 @alerts_context
-def acknowledge(actor, cmd, alertKey, severity):
+def acknowledge(actor, cmd, alertkey=None, severity='info', message=None):
     """acknowledge an alert"""
 
+    keyword = actor.monitoring[alertkey]
+    if keyword.severity != severity:
+        cmd.setState(cmd.Failed, "Severity does not match alert severity")
+        return None
 
-    cmd.writeToUsers("i", "activeAlerts={}".format(len(actor.activeAlerts)))
-    cmd.writeToUsers("i", "keywordsWatching={}".format(len(actor.dataModel)))
-    cmd.setState(cmd.Done)
+    # it seems messages can't be passed right. geez..
+    if len(message) > 0:
+        msg = "".join(("{} ".format(m) for m in message))
+    else:
+        msg = None
+
+    keyword.acknowledge(msg=msg)
+    cmd.setState(cmd.Done, 'acknowledged')
 
     return False

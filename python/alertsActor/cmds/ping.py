@@ -24,6 +24,6 @@ def ping(actor, cmd):
     """Pings the actor."""
 
     cmd.setState(cmd.Done, "I'm not dead yet!")
-    print(actor.heartbeats)
+    print("monitoring heartbeats for :", actor.heartbeats.keys())
 
     return False

@@ -163,7 +163,7 @@ class keyState(object):
         self.defaultSeverity = severity
         self.severity = 'info'
         self.acknowledged = False
-        self.acknowledgeMsg = None
+        self.acknowledgeMsg = ""
         self.dangerVal = dangerVal  # value on which to raise alert
         self.checkMe = Timer()
         self.defaultMsg = defaultMsg  # message to send user with alert
@@ -175,7 +175,7 @@ class keyState(object):
         self.active = True
         self.severity = self.defaultSeverity
         self.triggeredTime = time.time()
-        self.checkMe.start(600, self.reevaluate)
+        self.checkMe.start(30, self.reevaluate)
 
         self.msg = "alert={actorKey}, {severity}, {other}".format(actorKey=self.actorKey,
                     severity=self.severity, other='otherstuff')
@@ -200,7 +200,7 @@ class keyState(object):
     def reevaluate(self):
         if not self.acknowledged:
             self.dispatchAlertMessage(self.msg, severity=self.severity)
-            self.checkMe.start(600, self.reevaluate)
+            self.checkMe.start(30, self.reevaluate)
 
 
     def dispatchAlertMessage(self, msg, severity='info'):

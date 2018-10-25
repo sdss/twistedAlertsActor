@@ -25,6 +25,7 @@ def status(actor, cmd):
     print("current model: ", actor.hubModel)
 
     cmd.writeToUsers("i", "activeAlerts={}".format(len(actor.activeAlerts)))
+    cmd.writeToUsers("i", "unacknowledged={}".format(len([a for a in actor.activeAlerts if not a.acknowledged])))
     cmd.writeToUsers("i", "keywordsWatching={}".format(len(actor.hubModel)))
     cmd.setState(cmd.Done)
 
