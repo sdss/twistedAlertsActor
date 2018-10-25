@@ -85,18 +85,18 @@ class alertsActor(BaseActor):
         return self.hub.datamodel
 
 
-    def checkKey(self, actorKey):
+    def checkKey(self, newKeyval, actorKey):
         # update to datamodel, what do?
-        actor, keyword = actorKey.split('.')
-        key = self.hubModel[actor][keyword]
-        if key == self.monitoring[actorKey].dangerVal:
+
+        if newKeyval == self.monitoring[actorKey].dangerVal:
             if self.monitoring[actorKey].active:
                 # we already know
                 return None
             else:
                 self.monitoring[actorKey].setActive()
         else:
-            # if they changed and its good, then the alert is gone, right?
+            # if the key changed and its good, then the alert is gone, right?
+            # or possibly key changed and its just not bad? this is still fine to do
             self.monitoring[actorKey].resolve()
 
 
@@ -155,7 +155,7 @@ class keyState(object):
     '''Keep track of the state of each actor.key'''
 
     def __init__(self, alertsActor, actorKey='oop.forgot', severity='info', dangerVal=None,
-                 defaultMsg=''):
+                 defaultMsg='', **kwargs):
         self.alertsActorReference = alertsActor
         self.triggeredTime = None
         self.actorKey = actorKey

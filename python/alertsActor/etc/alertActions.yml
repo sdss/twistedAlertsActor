@@ -8,6 +8,7 @@ apogee.ditherPosition:
   cast: !!python/name:__builtin__.str
   severity: warning
   heartbeat: apogee
+  checkAfter: 15
 apogee.tempAlarms: 
   cast: !!python/name:__builtin__.str
   severity: warning

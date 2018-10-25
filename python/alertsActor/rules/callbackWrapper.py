@@ -29,34 +29,46 @@ class wrapCallbacks(object):
 
             if 'heartbeat' in actions.keys():
                 alertKey = actions['heartbeat'] + '.hearbeat'
-                callback = lambda _: self.pulse(actorKey=alertKey)
+                callback = self.pulse(alertKey=alertKey, checkAfter=actions['checkAfter'])
                 self.datamodel_callbacks[key] = callback
-                # print(key, actions, alertKey)
 
             else:
                 alertKey = key
-                callback = lambda _: self.updateKey(key)
+                callback = self.updateKey(key)
                 self.datamodel_callbacks[key] = callback
-                # print(key, actions, alertKey)
 
             self.alertsActor.addKey(alertKey, severity=actions['severity'], **otherArgs)
 
 
-    def pulse(self, actorKey='NOT_SPECIFIED', checkAfter=30):
-        """Update the heartbeat for a specified actor
+    def pulse(self, alertKey='NOT_SPECIFIED', checkAfter=30):
+        """Update the heartbeat for a specified actor.
+           The timer is restarted everytime its called, if it isn't restarted 
+           in time, a "dead actor" alert is raised
         """
-        if actorKey not in self.alertsActor.heartbeats.keys():
-            self.alertsActor.heartbeats[actorKey] = Timer()
+        if alertKey not in self.alertsActor.heartbeats.keys():
+            self.alertsActor.heartbeats[alertKey] = Timer()
 
-        self.alertsActor.heartbeats[actorKey].start(checkAfter, lambda: self.itsDeadJim(alertKey=actorKey))
-        print('pulsing {}, time {}'.format(actorKey, time.time()))
+        deadCallback = self.itsDeadJim(alertKey=alertKey)
+        def startTime(newKeyval):
+            # called as callback, so the updated key is passed by default
+            print('pulse: ', alertKey, newKeyval)
+            self.alertsActor.heartbeats[alertKey].start(checkAfter, deadCallback)
+
+        return startTime
 
 
-    def updateKey(self, key):
-        self.alertsActor.checkKey(key)
+    def updateKey(self, actorKey):
+        def check(newKeyval):
+            # called as callback, so the updated key is passed by default
+            self.alertsActor.checkKey(newKeyval, actorKey)
+
+        return check
 
 
     def itsDeadJim(self, alertKey='NOT_SPECIFIED'):
-        print("its dead its dead!!! {}".format(alertKey))
-        self.alertsActor.monitoring[alertKey].setActive()
+        # some actor stopped outputting a keyword, raise the alarm!
+        def setActive():
+            self.alertsActor.monitoring[alertKey].setActive()
+        
+        return setActive
 
