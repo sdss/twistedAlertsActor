@@ -2,8 +2,6 @@
 # encoding: utf-8
 #
 # status.py
-#
-# Created by José Sánchez-Gallego on 19 Mar 2017.
 
 
 from __future__ import division
@@ -22,11 +20,24 @@ __all__ = ('status')
 def status(actor, cmd):
     """returns actor status"""
 
-    print("current model: ", actor.hubModel)
+    # print("current model: ", actor.hubModel)
 
-    cmd.writeToUsers("i", "activeAlerts={}".format(len(actor.activeAlerts)))
-    cmd.writeToUsers("i", "unacknowledged={}".format(len([a for a in actor.activeAlerts if not a.acknowledged])))
-    cmd.writeToUsers("i", "keywordsWatching={}".format(len(actor.hubModel)))
+    activeMessage = "activeAlerts{}".format(("=" if len(actor.activeAlerts) else "")) +\
+                       ", ".join(["{}".format(a.actorKey) for a in actor.activeAlerts])
+
+    disabledMessage = "disabledAlertRules{}".format(("=" if len(actor.disabledAlerts) else "")) +\
+                       ", ".join(["({}, {}, {})".format(a.actorKey, a.severity, a.disabledBy)
+                                  for a in actor.disabledAlerts])
+
+    cmd.writeToUsers("i", activeMessage)
+    cmd.writeToUsers("i", disabledMessage)
+    
+    for a in actor.activeAlerts:
+        a.dispatchAlertMessage()
+
+    # cmd.writeToUsers("i", "activeAlerts={}".format(len(actor.activeAlerts)))
+    # cmd.writeToUsers("i", "unacknowledged={}".format(len([a for a in actor.activeAlerts if not a.acknowledged])))
+    # cmd.writeToUsers("i", "keywordsWatching={}".format(len(actor.hubModel)))
     cmd.setState(cmd.Done)
 
     return False

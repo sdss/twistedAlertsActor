@@ -28,7 +28,7 @@ class wrapCallbacks(object):
             otherArgs = {k: actions[k] for k in actions.keys() if k not in initKeys}
 
             if 'heartbeat' in actions.keys():
-                alertKey = actions['heartbeat'] + '.hearbeat'
+                alertKey = actions['heartbeat'] + '.heartbeat'
                 callback = self.pulse(alertKey=alertKey, checkAfter=actions['checkAfter'])
                 self.datamodel_callbacks[key] = callback
 
@@ -52,6 +52,7 @@ class wrapCallbacks(object):
         def startTime(newKeyval):
             # called as callback, so the updated key is passed by default
             print('pulse: ', alertKey, newKeyval)
+            self.alertsActor.monitoring[alertKey].keyword = newKeyval
             self.alertsActor.heartbeats[alertKey].start(checkAfter, deadCallback)
 
         return startTime
@@ -60,7 +61,8 @@ class wrapCallbacks(object):
     def updateKey(self, actorKey):
         def check(newKeyval):
             # called as callback, so the updated key is passed by default
-            self.alertsActor.checkKey(newKeyval, actorKey)
+            self.alertsActor.monitoring[alertKey] = newKeyval
+            self.alertsActor.monitoring[alertKey].checkKey()
 
         return check
 

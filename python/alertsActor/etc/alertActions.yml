@@ -6,21 +6,62 @@
 # the extra !!python/etc... is to read it in as a function
 apogee.ditherPosition: 
   cast: !!python/name:__builtin__.str
-  severity: warning
+  severity: warn
   heartbeat: apogee
   checkAfter: 15
+  emailAddresses: ['j.donor@tcu.edu']
+  selfClear: True
 apogee.tempAlarms: 
   cast: !!python/name:__builtin__.str
-  severity: warning
+  severity: warn
 apogee.vacuumAlarm: 
   cast: !!python/name:__builtin__.str
-  severity: warning
+  severity: warn
 apogee.ln2Alarm: 
   cast: !!python/name:__builtin__.str
-  severity: warning
+  severity: warn
 apogee.collIndexer: 
   cast: !!python/name:__builtin__.str
-  severity: warning
+  severity: warn
 apogee.ditherIndexer: 
   cast: !!python/name:__builtin__.str
-  severity: warning
+  severity: warn
+apogeeql.rootURL:
+  cast: !!python/name:__builtin__.str
+  severity: warn
+  heartbeat: apogeeql
+  checkAfter: 15
+  selfClear: True
+apogeeql.icsDiskAlarm:
+  cast: !!python/name:__builtin__.str
+  severity: warn
+apogeeql.qlDiskAlarm:
+  cast: !!python/name:__builtin__.str
+  severity: warn
+apogeeql.archDiskAlarm:
+  cast: !!python/name:__builtin__.str
+  severity: warn
+# boss.SP1[RB][0-3]?CCDTemp:
+#   cast:
+# boss.SP2[RB][0-3]?CCDTemp:
+#   cast:
+# boss.SP1SecondaryDewarPress:
+#   cast:
+# boss.SP2SecondaryDewarPress:
+#   cast:
+# boss.SP1(DAQ|Mech|Micro)NotTalking:
+#   cast:
+# boss.SP2(DAQ|Mech|Micro)NotTalking:
+#   cast:
+# boss.DACS_SET:
+#   cast:
+# boss.DACS_SET:
+#   cast:
+# boss.SP1LN2Fill:
+#   cast:
+# boss.SP2LN2Fill:
+#   cast:
+# boss.SP1(Exec|Phase)Boot:
+#   cast:
+# boss.SP2(Exec|Phase)Boot:
+#   cast:

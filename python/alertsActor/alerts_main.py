@@ -10,7 +10,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import json
-import yaml
+# import yaml
 import sys
 import traceback
 
@@ -72,6 +72,16 @@ class alertsActor(BaseActor):
 
 
     @property
+    def disabledAlerts(self):
+        disabled = []
+        for k, a in self.monitoring.items():
+            if a.disabled:
+                disabled.append(a)
+
+        return disabled
+
+
+    @property
     def hubModel(self):
         # keeps a running data model of keywords coming from the hub
         # allows callbacks on updates
@@ -94,10 +104,10 @@ class alertsActor(BaseActor):
                 return None
             else:
                 self.monitoring[actorKey].setActive()
-        else:
+        elif self.monitoring[actorKey].selfClear:
             # if the key changed and its good, then the alert is gone, right?
             # or possibly key changed and its just not bad? this is still fine to do
-            self.monitoring[actorKey].resolve()
+            self.monitoring[actorKey].clear()
 
 
     def parseAndDispatchCmd(self, cmd):
@@ -150,40 +160,62 @@ class alertsActor(BaseActor):
             # This catches the SystemExit that Click insists in returning.
             pass
 
+def ack(acknowledged):
+    if acknowledged:
+        return "ack"
+    else:
+        return "noack"
 
 class keyState(object):
     '''Keep track of the state of each actor.key'''
 
-    def __init__(self, alertsActor, actorKey='oop.forgot', severity='info', dangerVal=None,
-                 defaultMsg='', **kwargs):
+    def __init__(self, alertsActor, actorKey='oop.forgot', severity='info', keyword="", dangerVal=None,
+                 defaultMsg='', selfClear=False, emailAddresses=['fail@fail.com'], **kwargs):
         self.alertsActorReference = alertsActor
         self.triggeredTime = None
         self.actorKey = actorKey
+        self.keyword = keyword
         self.active = False
+        self.disabled = False
         self.defaultSeverity = severity
         self.severity = 'info'
         self.acknowledged = False
         self.acknowledgeMsg = ""
+        self.acknowledger = -1
         self.dangerVal = dangerVal  # value on which to raise alert
         self.checkMe = Timer()
         self.defaultMsg = defaultMsg  # message to send user with alert
-        self.msg = "all good"  # formatted message, "all good" should never be sent
+        self.selfClear = selfClear
+        self.sleepTime = 30
+        self.emailAddresses = emailAddresses
+
+        assert self.severity in ['ok', 'info', 'apogeediskwarn','warn', 'serious', 'critical'], "severity info not allowed"
+
+    @property
+    def msg(self):
+        return "alert={actorkey},{severity},{keyword},{enable},{acknowledged},{acknowledger}".format(actorkey=self.actorKey,
+               keyword="A", severity=self.severity, enable="enabled", 
+               acknowledged=ack(self.acknowledged), acknowledger=self.acknowledger)
 
 
     def setActive(self):
         # something cause a problem, do stuff
         self.active = True
         self.severity = self.defaultSeverity
+        print("update severity! {}, {}".format(self.actorKey, self.severity))
         self.triggeredTime = time.time()
-        self.checkMe.start(30, self.reevaluate)
+        self.checkMe.start(self.sleepTime, self.reevaluate)
 
-        self.msg = "alert={actorKey}, {severity}, {other}".format(actorKey=self.actorKey,
-                    severity=self.severity, other='otherstuff')
+        # # example alert=boss.SP1RedIonPump,warn,"Reported by camCheck",enabled,noack,""
+        # self.msg = "alert={actorkey},{severity},{keyword},{enable},{acknowledged},{acknowledger}".format(actorkey=self.actorKey,
+        #             keyword="A", severity=self.severity, enable="enabled", 
+        #             acknowledged=ack(self.acknowledged), acknowledger=self.acknowledger)
+        #             # triggered=time.strftime("%d%b%Y,%H:%M:%S", time.localtime(self.triggeredTime)))
 
-        self.dispatchAlertMessage(self.msg, severity=self.severity)
+        self.dispatchAlertMessage()
 
 
-    def resolve(self):
+    def clear(self):
         # everything good, back to normal
         self.active = False
         self.checkMe = Timer()
@@ -198,18 +230,42 @@ class keyState(object):
 
 
     def reevaluate(self):
+        # at some point this will presumably raise alert level?
+        # possibly send email? Or only send email for critical? Or...
         if not self.acknowledged:
-            self.dispatchAlertMessage(self.msg, severity=self.severity)
-            self.checkMe.start(30, self.reevaluate)
+            self.dispatchAlertMessage()
+            self.checkMe.start(self.sleepTime, self.reevaluate)
 
 
-    def dispatchAlertMessage(self, msg, severity='info'):
+    def dispatchAlertMessage(self):
         # write an alert to users
-        if severity == 'critical':
+
+        if self.severity == 'critical':
             broadcastSeverity = 'e'
-        elif severity == 'warning' or severity == 'serious':
+        elif self.severity == 'warning' or self.severity == 'serious':
             broadcastSeverity = 'w'
         else:
             broadcastSeverity = 'i'
 
-        self.alertsActorReference.writeToUsers(broadcastSeverity, msg)
+        self.alertsActorReference.writeToUsers(broadcastSeverity, self.msg)
+
+
+    def checkKey(self):
+        # check key, should be called when keyword changes
+
+        if self.keyword == self.dangerVal:
+            if self.active:
+                # we already know
+                return None
+            else:
+                self.setActive()
+        elif self.selfClear:
+            # if the key changed and its good, then the alert is gone, right?
+            # or possibly key changed and its just not bad? this is still fine to do
+            self.clear()
+
+
+    def disable(self, disabler):
+        self.disalbed = True
+        self.disalbedBy = disabler
+        # probably do some more stuff
