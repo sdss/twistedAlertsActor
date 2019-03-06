@@ -1,7 +1,7 @@
 import time 
 
 import smtplib
-from email.MIMEText import MIMEText
+from email.mime.text import MIMEText
 
 def sendEmail(keyState, mailClient):
     """Send an email. 
@@ -10,8 +10,6 @@ def sendEmail(keyState, mailClient):
     -keyState: keyState object from alerts_main
     -mailClient: str, the mail server to connect to
     """
-    import smtplib
-    from email.MIMEText import MIMEText
 
     # Adds the time to the text
     text = keyState.msg + '\n\nEmail sent on ' + time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()) + '\n'
@@ -22,8 +20,8 @@ def sendEmail(keyState, mailClient):
 
     sender = recipients[0]
 
-    subject = "{} alert on {}" % (severity, keyState.actorKey)
-    msg = MIMEText("{}\n\n{}" % (subject, text))
+    subject = "{} alert on {}".format(severity, keyState.actorKey)
+    msg = MIMEText("{}\n\n{}".format(subject, text))
 
     msg['Subject'] = subject
 

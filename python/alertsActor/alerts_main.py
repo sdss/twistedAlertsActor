@@ -26,7 +26,7 @@ from alertsActor import __version__, alertActions
 from alertsActor.cmds.cmd_parser import alerts_parser
 from alertsActor.logger import log
 
-from alertsActor.rules import callbackWrapper
+from alertsActor.rules import callbackWrapper, mail
 
 
 class alertsActor(BaseActor):
@@ -188,6 +188,7 @@ class keyState(object):
         self.selfClear = selfClear
         self.sleepTime = 30
         self.emailAddresses = emailAddresses
+        self.client = "localhost:1025"
 
         assert self.severity in ['ok', 'info', 'apogeediskwarn','warn', 'serious', 'critical'], "severity info not allowed"
 
@@ -206,13 +207,8 @@ class keyState(object):
         self.triggeredTime = time.time()
         self.checkMe.start(self.sleepTime, self.reevaluate)
 
-        # # example alert=boss.SP1RedIonPump,warn,"Reported by camCheck",enabled,noack,""
-        # self.msg = "alert={actorkey},{severity},{keyword},{enable},{acknowledged},{acknowledger}".format(actorkey=self.actorKey,
-        #             keyword="A", severity=self.severity, enable="enabled", 
-        #             acknowledged=ack(self.acknowledged), acknowledger=self.acknowledger)
-        #             # triggered=time.strftime("%d%b%Y,%H:%M:%S", time.localtime(self.triggeredTime)))
-
         self.dispatchAlertMessage()
+        self.sendEmail()
 
 
     def clear(self):
@@ -224,7 +220,7 @@ class keyState(object):
 
     def acknowledge(self, msg=None):
         if msg is not None:
-            self.acknowledgeMsg += msg + "\n" # so we can add many... I guess?
+            self.acknowledgeMsg += msg + ";" # so we can add many... I guess?
 
         self.acknowledged = True
 
@@ -236,6 +232,10 @@ class keyState(object):
             self.dispatchAlertMessage()
             self.checkMe.start(self.sleepTime, self.reevaluate)
 
+
+    def sendEmail(self):
+        # notify over email
+        mail.sendEmail(self, self.client)
 
     def dispatchAlertMessage(self):
         # write an alert to users
