@@ -26,7 +26,7 @@ from alertsActor import __version__, alertActions
 from alertsActor.cmds.cmd_parser import alerts_parser
 from alertsActor.logger import log
 
-from alertsActor.rules import callbackWrapper, mail
+from alertsActor.rules import callbackWrapper, mail, sms
 
 
 class alertsActor(BaseActor):
@@ -236,6 +236,8 @@ class keyState(object):
     def sendEmail(self):
         # notify over email
         mail.sendEmail(self, self.client)
+        # and sms?
+        sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
 
     def dispatchAlertMessage(self):
         # write an alert to users
