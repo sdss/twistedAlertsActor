@@ -11,21 +11,27 @@ apogee.ditherPosition:
   checkAfter: 15
   emailAddresses: ['j.donor@tcu.edu']
   selfClear: True
+  instrument: apogee
 apogee.tempAlarms: 
   cast: !!python/name:__builtin__.str
   severity: warn
+  instrument: apogee
 apogee.vacuumAlarm: 
   cast: !!python/name:__builtin__.str
   severity: warn
+  instrument: apogee
 apogee.ln2Alarm: 
   cast: !!python/name:__builtin__.str
   severity: warn
+  instrument: apogee
 apogee.collIndexer: 
   cast: !!python/name:__builtin__.str
   severity: warn
+  instrument: apogee
 apogee.ditherIndexer: 
   cast: !!python/name:__builtin__.str
   severity: warn
+  instrument: apogee
 apogeeql.rootURL:
   cast: !!python/name:__builtin__.str
   severity: warn

@@ -42,12 +42,17 @@ class alertsActor(BaseActor):
         # a dictionary of actor keys we're watching
         self.monitoring = dict()
 
+        # keep track of downed instruments
+        # since its either up or down, make boolean
+        # UP = True, DOWN = False
+        self.instrumentUp = dict()
+
         # keep track of heartbeats
         self.heartbeats = dict()
 
         self.callbacks = callbackWrapper.wrapCallbacks(self, alertActions)
 
-        self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts, 
+        self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts,
                                      datamodel_callbacks=self.callbacks.datamodel_callbacks)
 
         log.info('starting alertsActor actor version={!r} in port={}'
@@ -86,10 +91,10 @@ class alertsActor(BaseActor):
         # keeps a running data model of keywords coming from the hub
         # allows callbacks on updates
 
-        # this may need to be more careful... test! 
+        # this may need to be more careful... test!
         if self.hub is None:
             print("no hub connection, reconnecting!")
-            self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts, 
+            self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts,
                                          datamodel_callbacks=self.callbacks.datamodel_callbacks)
 
         return self.hub.datamodel
@@ -177,6 +182,7 @@ class keyState(object):
         self.keyword = keyword
         self.active = False
         self.disabled = False
+        self.disalbedBy = -1
         self.defaultSeverity = severity
         self.severity = 'info'
         self.acknowledged = False
@@ -188,19 +194,36 @@ class keyState(object):
         self.selfClear = selfClear
         self.sleepTime = 30
         self.emailAddresses = emailAddresses
-        self.client = "localhost:1025"
+        self.smtpclient = "localhost:1025"
+
+        if "instrument" in kwargs:
+            self.instrument = kwargs.get("instrument")
+        else:
+            self.instrument = None
 
         assert self.severity in ['ok', 'info', 'apogeediskwarn','warn', 'serious', 'critical'], "severity info not allowed"
 
     @property
     def msg(self):
         return "alert={actorkey},{severity},{keyword},{enable},{acknowledged},{acknowledger}".format(actorkey=self.actorKey,
-               keyword="A", severity=self.severity, enable="enabled", 
+               keyword="A", severity=self.severity, enable="enabled",
                acknowledged=ack(self.acknowledged), acknowledger=self.acknowledger)
 
 
+    def instDown(self):
+        if self.instrument is None:
+            return False
+
+        if self.alertsActorReference.instrumentUp[self.instrument]:
+            return False
+        else:
+            return True
+
     def setActive(self):
         # something cause a problem, do stuff
+        if self.instDown():
+            print("!!{} instrument down, no alert!!".format(self.actorKey))
+            return None
         self.active = True
         self.severity = self.defaultSeverity
         print("update severity! {}, {}".format(self.actorKey, self.severity))
@@ -218,24 +241,37 @@ class keyState(object):
         self.severity = 'info'
 
 
-    def acknowledge(self, msg=None):
+    def acknowledge(self, msg=None, acknowledgedBy=None, unack=False):
         if msg is not None:
             self.acknowledgeMsg += msg + ";" # so we can add many... I guess?
 
-        self.acknowledged = True
+        if acknowledgedBy is not None:
+            self.acknowledger = acknowledgedBy
+
+        if unack:
+            self.acknowledged = False
+        else:
+            self.acknowledged = True
 
 
     def reevaluate(self):
         # at some point this will presumably raise alert level?
         # possibly send email? Or only send email for critical? Or...
-        if not self.acknowledged:
-            self.dispatchAlertMessage()
+
+        if self.acknowledged:
+            return
+
+        if self.disabled:
             self.checkMe.start(self.sleepTime, self.reevaluate)
+            return
+
+        self.dispatchAlertMessage()
+        self.checkMe.start(self.sleepTime, self.reevaluate)
 
 
     def sendEmail(self):
         # notify over email
-        mail.sendEmail(self, self.client)
+        mail.sendEmail(self, self.smtpclient)
         # and sms?
         sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
 
@@ -244,7 +280,7 @@ class keyState(object):
 
         if self.severity == 'critical':
             broadcastSeverity = 'e'
-        elif self.severity == 'warning' or self.severity == 'serious':
+        elif self.severity == 'warn' or self.severity == 'serious':
             broadcastSeverity = 'w'
         else:
             broadcastSeverity = 'i'
@@ -267,7 +303,15 @@ class keyState(object):
             self.clear()
 
 
-    def disable(self, disabler):
+    def disable(self, severity, disabledBy):
         self.disalbed = True
-        self.disalbedBy = disabler
+        self.disalbedBy = disabledBy
+
+        self.active = False
+
         # probably do some more stuff
+
+
+    def enable(self):
+        self.disalbed = False
+        self.checkKey()

@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# disable.py
+
+
+
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+
+import click
+
+from alertsActor.cmds import alerts_context
+
+__all__ = ('disable')
+
+
+@click.command()
+@click.argument('alertkey', nargs=1, default=None, required=True)
+@click.argument('severity', nargs=1, default='info', 
+                type=click.Choice(['ok', 'info', 'apogeediskwarn','warn', 'serious', 'critical']))
+@alerts_context
+def disable(actor, cmd, alertkey=None, severity='info'):
+    """disable an alert"""
+
+    if isinstance(alertkey, unicode):
+        alertkey = str(alertkey)  # .decode("utf-8")
+
+    keyword = actor.monitoring[alertkey]
+
+    keyword.disable(severity, disabledBy=cmd.userID)
+    cmd.setState(cmd.Done, 'disabled')
+
+    return False

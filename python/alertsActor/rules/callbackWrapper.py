@@ -10,7 +10,7 @@ from RO.Comm.TwistedTimer import Timer
 
 
 class wrapCallbacks(object):
-    """Lets try this. Pass in keywords read from a file
+    """Pass in keywords read from a file
        along with their alert type. 
     """
 
@@ -36,6 +36,9 @@ class wrapCallbacks(object):
                 alertKey = key
                 callback = self.updateKey(key)
                 self.datamodel_callbacks[key] = callback
+
+            if "instrument" in actions.keys():
+                alertsActor.instrumentUp[actions["instrument"]] = True
 
             self.alertsActor.addKey(alertKey, severity=actions['severity'], **otherArgs)
 

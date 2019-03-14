@@ -14,12 +14,12 @@ import json
 
 import click
 
-__all__ = ('help')
+__all__ = ('cheatSheet')
 
 
 @click.command()
 @click.pass_context
-def help(ctx):
+def cheatSheet(ctx):
     """Shows the help."""
 
     cmd = ctx.obj['cmd']

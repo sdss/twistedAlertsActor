@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 #
-# acknowledge.py
+# unacknowledge.py
 #
 
 
@@ -13,7 +13,7 @@ import click
 
 from alertsActor.cmds import alerts_context
 
-__all__ = ('acknowledge')
+__all__ = ('unacknowledge')
 
 
 @click.command()
@@ -22,8 +22,8 @@ __all__ = ('acknowledge')
                 type=click.Choice(['ok', 'info', 'apogeediskwarn','warn', 'serious', 'critical']))
 @click.option('-m', '--message', multiple=True, default=None, help='a short message to hang on to')
 @alerts_context
-def acknowledge(actor, cmd, alertkey=None, severity='info', message=None):
-    """acknowledge an alert"""
+def unacknowledge(actor, cmd, alertkey=None, severity='info', message=None):
+    """unacknowledge an alert"""
 
     if isinstance(alertkey, unicode):
         alertkey = str(alertkey)  # .decode("utf-8")
@@ -40,7 +40,7 @@ def acknowledge(actor, cmd, alertkey=None, severity='info', message=None):
     else:
         msg = None
 
-    keyword.acknowledge(msg=msg, acknowledgedBy=cmd.userID)
-    cmd.setState(cmd.Done, 'acknowledged')
+    keyword.acknowledge(msg=msg, acknowledgedBy=cmd.userID, unack=True)
+    cmd.setState(cmd.Done, 'unacknowledged')
 
     return False
