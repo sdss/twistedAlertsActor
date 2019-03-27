@@ -148,10 +148,14 @@ class alertsActor(BaseActor):
         cmd.setState(cmd.Running)
 
         try:
-            result = test_cmd(cmd.cmdBody.split())
+            # stui wants to pass keyword args, parse doesn't support that
+            # this is definitely bad form, but we're trying not to change
+            # stui yet
+            args = [a.split("=")[-1] for a in cmd.cmdBody.split()]
+            result = test_cmd(args)
             if result is False:
                 return
-            alerts_parser(cmd.cmdBody.split(), obj=dict(actor=self, cmd=cmd))
+            alerts_parser(args, obj=dict(actor=self, cmd=cmd))
         except CommandError as ee:
             cmd.setState('failed', textMsg=strFromException(ee))
             return
@@ -182,7 +186,7 @@ class keyState(object):
         self.keyword = keyword
         self.active = False
         self.disabled = False
-        self.disalbedBy = -1
+        self.disabledBy = -1
         self.defaultSeverity = severity
         self.severity = 'info'
         self.acknowledged = False
@@ -253,6 +257,8 @@ class keyState(object):
         else:
             self.acknowledged = True
 
+        self.dispatchAlertMessage()
+
 
     def reevaluate(self):
         # at some point this will presumably raise alert level?
@@ -273,7 +279,7 @@ class keyState(object):
         # notify over email
         mail.sendEmail(self, self.smtpclient)
         # and sms?
-        sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
+        # sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
 
     def dispatchAlertMessage(self):
         # write an alert to users
@@ -304,14 +310,14 @@ class keyState(object):
 
 
     def disable(self, severity, disabledBy):
-        self.disalbed = True
-        self.disalbedBy = disabledBy
+        self.disabled = True
+        self.disabledBy = disabledBy
 
-        self.active = False
+        # self.active = False
 
         # probably do some more stuff
 
 
     def enable(self):
-        self.disalbed = False
+        self.disabled = False
         self.checkKey()

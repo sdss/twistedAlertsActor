@@ -23,7 +23,7 @@ __all__ = ('instrumentState')
 def instrumentState(actor, cmd, instrument=None, state="up"):
     """acknowledge an alert"""
 
-    if state = "down":
+    if state == "down":
         actor.instrumentUp[instrument] = False
     else:
         actor.instrumentUp[instrument] = True

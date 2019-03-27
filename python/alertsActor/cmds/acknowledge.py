@@ -17,18 +17,18 @@ __all__ = ('acknowledge')
 
 
 @click.command()
-@click.argument('alertkey', nargs=1, default=None, required=True)
+@click.argument('id', nargs=1, default=None, required=True)
 @click.argument('severity', nargs=1, default='info', 
                 type=click.Choice(['ok', 'info', 'apogeediskwarn','warn', 'serious', 'critical']))
 @click.option('-m', '--message', multiple=True, default=None, help='a short message to hang on to')
 @alerts_context
-def acknowledge(actor, cmd, alertkey=None, severity='info', message=None):
+def acknowledge(actor, cmd, id=None, severity='info', message=None):
     """acknowledge an alert"""
 
-    if isinstance(alertkey, unicode):
-        alertkey = str(alertkey)  # .decode("utf-8")
+    if isinstance(id, unicode):
+        id = str(id)  # .decode("utf-8")
 
-    keyword = actor.monitoring[alertkey]
+    keyword = actor.monitoring[id]
     
     if keyword.severity != severity:
         cmd.setState(cmd.Failed, "Severity does not match alert severity")

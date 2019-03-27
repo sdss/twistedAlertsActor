@@ -25,11 +25,25 @@ def disable(actor, cmd, alertkey=None, severity='info'):
     """disable an alert"""
 
     if isinstance(alertkey, unicode):
-        alertkey = str(alertkey)  # .decode("utf-8")
+        alertkey = str(alertkey)
 
     keyword = actor.monitoring[alertkey]
 
     keyword.disable(severity, disabledBy=cmd.userID)
+
+    activeMessage = "activeAlerts{}".format(("=" if len(actor.activeAlerts) else "")) +\
+                       ", ".join(["{}".format(a.actorKey) for a in actor.activeAlerts])
+
+    disabledMessage = "disabledAlertRules{}".format(("=" if len(actor.disabledAlerts) else "")) +\
+                       ", ".join(['"({}, {}, {})"'.format(a.actorKey, a.severity, a.disabledBy)
+                                  for a in actor.disabledAlerts])
+
+    cmd.writeToUsers("i", activeMessage)
+    cmd.writeToUsers("i", disabledMessage)
+
+    for a in actor.activeAlerts:
+        a.dispatchAlertMessage()
+
     cmd.setState(cmd.Done, 'disabled')
 
     return False
