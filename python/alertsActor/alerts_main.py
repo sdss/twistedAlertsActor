@@ -175,15 +175,23 @@ def ack(acknowledged):
     else:
         return "noack"
 
+
+def enabled(disabled):
+    if disabled:
+        return "disabled"
+    else:
+        return "enabled"
+
 class keyState(object):
     '''Keep track of the state of each actor.key'''
 
     def __init__(self, alertsActor, actorKey='oop.forgot', severity='info', keyword="", dangerVal=None,
-                 defaultMsg='', selfClear=False, emailAddresses=['fail@fail.com'], **kwargs):
+                 selfClear=False, emailAddresses=['fail@fail.com'], **kwargs):
         self.alertsActorReference = alertsActor
         self.triggeredTime = None
         self.actorKey = actorKey
         self.keyword = keyword
+        self.lastalive = time.time()  # updated for heartbeats
         self.active = False
         self.disabled = False
         self.disabledBy = -1
@@ -194,9 +202,8 @@ class keyState(object):
         self.acknowledger = -1
         self.dangerVal = dangerVal  # value on which to raise alert
         self.checkMe = Timer()
-        self.defaultMsg = defaultMsg  # message to send user with alert
         self.selfClear = selfClear
-        self.sleepTime = 30
+        self.sleepTime = 10
         self.emailAddresses = emailAddresses
         self.smtpclient = "localhost:1025"
 
@@ -205,12 +212,15 @@ class keyState(object):
         else:
             self.instrument = None
 
-        assert self.severity in ['ok', 'info', 'apogeediskwarn','warn', 'serious', 'critical'], "severity info not allowed"
+        if "checkAfter" in kwargs:
+            self.checkAfter = kwargs.get("checkAfter")
+
+        assert self.severity in ['ok', 'info', 'apogeediskwarn', 'warn', 'serious', 'critical'], "severity level not allowed"
 
     @property
     def msg(self):
-        return "alert={actorkey},{severity},{keyword},{enable},{acknowledged},{acknowledger}".format(actorkey=self.actorKey,
-               keyword="A", severity=self.severity, enable="enabled",
+        return "alert={actorkey}, {severity}, {keyword}, {enable}, {acknowledged}, {acknowledger}".format(actorkey=self.actorKey,
+               keyword=self.keyword, severity=self.severity, enable=enabled(self.disabled),
                acknowledged=ack(self.acknowledged), acknowledger=self.acknowledger)
 
 
@@ -230,7 +240,6 @@ class keyState(object):
             return None
         self.active = True
         self.severity = self.defaultSeverity
-        print("update severity! {}, {}".format(self.actorKey, self.severity))
         self.triggeredTime = time.time()
         self.checkMe.start(self.sleepTime, self.reevaluate)
 
@@ -281,6 +290,7 @@ class keyState(object):
         # and sms?
         # sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
 
+
     def dispatchAlertMessage(self):
         # write an alert to users
 
@@ -296,6 +306,11 @@ class keyState(object):
 
     def checkKey(self):
         # check key, should be called when keyword changes
+
+        if "heartbeat" in self.actorKey:
+            if time.time() - self.lastalive < self.checkAfter:
+                self.clear()
+            return None
 
         if self.keyword == self.dangerVal:
             if self.active:

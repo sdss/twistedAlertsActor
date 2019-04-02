@@ -26,7 +26,7 @@ def status(actor, cmd):
                        ", ".join(["{}".format(a.actorKey) for a in actor.activeAlerts])
 
     disabledMessage = "disabledAlertRules{}".format(("=" if len(actor.disabledAlerts) else "")) +\
-                       ", ".join(["({}, {}, {})".format(a.actorKey, a.severity, a.disabledBy)
+                       ", ".join(['"({}, {}, {})"'.format(a.actorKey, a.severity, a.disabledBy)
                                   for a in actor.disabledAlerts])
 
     cmd.writeToUsers("i", activeMessage)

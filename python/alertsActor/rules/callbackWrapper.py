@@ -54,8 +54,9 @@ class wrapCallbacks(object):
         deadCallback = self.itsDeadJim(alertKey=alertKey)
         def startTime(newKeyval):
             # called as callback, so the updated key is passed by default
-            print('pulse: ', alertKey, newKeyval)
-            self.alertsActor.monitoring[alertKey].keyword = newKeyval
+            print('pulse: ', alertKey, newKeyval[0])
+            self.alertsActor.monitoring[alertKey].keyword = newKeyval[0]
+            self.alertsActor.monitoring[alertKey].lastalive = time.time()
             self.alertsActor.heartbeats[alertKey].start(checkAfter, deadCallback)
 
         return startTime
@@ -64,7 +65,7 @@ class wrapCallbacks(object):
     def updateKey(self, actorKey):
         def check(newKeyval):
             # called as callback, so the updated key is passed by default
-            self.alertsActor.monitoring[alertKey] = newKeyval
+            self.alertsActor.monitoring[alertKey].keyword = newKeyval
             self.alertsActor.monitoring[alertKey].checkKey()
 
         return check
