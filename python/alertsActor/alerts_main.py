@@ -86,6 +86,33 @@ class alertsActor(BaseActor):
         return disabled
 
 
+    def broadcastActive(self):
+        activeMessage = "activeAlerts{}".format(("=" if len(self.activeAlerts) else "")) +\
+                       ", ".join(["{}".format(a.actorKey) for a in self.activeAlerts])
+        self.writeToUsers("i", activeMessage)
+
+
+    def broadcastDisabled(self):
+        disabledMessage = "disabledAlertRules{}".format(("=" if len(self.disabledAlerts) else "")) +\
+                       ", ".join(['"({}, {}, {})"'.format(a.actorKey, a.severity, a.disabledBy)
+                                  for a in self.disabledAlerts])
+        self.writeToUsers("i", disabledMessage)
+
+
+    def broadcastAll(self):
+        for a in self.activeAlerts:
+            a.dispatchAlertMessage()
+
+
+    def broadcastInstruments(self):
+        instruments = list()
+        for k, a in self.monitoring.items():
+            if a.instrument is not None and not a.instrument in instruments:
+                instruments.append(a.instrument)
+        down = [i for i in instruments if not self.instrumentUp[i]]
+        self.writeToUsers("i", 'instrumentNames={}'.format(",".join(instruments)))
+        self.writeToUsers("i", 'downInstruments={}'.format(",".join(down)))
+
     @property
     def hubModel(self):
         # keeps a running data model of keywords coming from the hub
@@ -100,19 +127,19 @@ class alertsActor(BaseActor):
         return self.hub.datamodel
 
 
-    def checkKey(self, newKeyval, actorKey):
-        # update to datamodel, what do?
+    # def checkKey(self, newKeyval, actorKey):
+    #     # update to datamodel, what do?
 
-        if newKeyval == self.monitoring[actorKey].dangerVal:
-            if self.monitoring[actorKey].active:
-                # we already know
-                return None
-            else:
-                self.monitoring[actorKey].setActive()
-        elif self.monitoring[actorKey].selfClear:
-            # if the key changed and its good, then the alert is gone, right?
-            # or possibly key changed and its just not bad? this is still fine to do
-            self.monitoring[actorKey].clear()
+    #     if newKeyval == self.monitoring[actorKey].dangerVal:
+    #         if self.monitoring[actorKey].active:
+    #             # we already know
+    #             return None
+    #         else:
+    #             self.monitoring[actorKey].setActive()
+    #     elif self.monitoring[actorKey].selfClear:
+    #         # if the key changed and its good, then the alert is gone, right?
+    #         # or possibly key changed and its just not bad? this is still fine to do
+    #         self.monitoring[actorKey].clear()
 
 
     def parseAndDispatchCmd(self, cmd):
@@ -151,7 +178,8 @@ class alertsActor(BaseActor):
             # stui wants to pass keyword args, parse doesn't support that
             # this is definitely bad form, but we're trying not to change
             # stui yet
-            args = [a.split("=")[-1] for a in cmd.cmdBody.split()]
+            # click is case sensetive and requires lower-case -_-
+            args = [a.split("=")[-1].lower() for a in cmd.cmdBody.split()]
             result = test_cmd(args)
             if result is False:
                 return
@@ -253,6 +281,10 @@ class keyState(object):
         self.checkMe = Timer()
         self.severity = 'info'
 
+        self.alertsActorReference.broadcastActive()
+        self.alertsActorReference.broadcastDisabled()
+        self.alertsActorReference.broadcastAll()
+
 
     def acknowledge(self, msg=None, acknowledgedBy=None, unack=False):
         if msg is not None:
@@ -272,8 +304,13 @@ class keyState(object):
     def reevaluate(self):
         # at some point this will presumably raise alert level?
         # possibly send email? Or only send email for critical? Or...
+        self.checkKey()
+        if not self.active:
+            return
 
         if self.acknowledged:
+            # keep checking myself until I go away
+            self.checkMe.start(self.sleepTime, self.reevaluate)
             return
 
         if self.disabled:

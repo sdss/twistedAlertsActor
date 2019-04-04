@@ -31,18 +31,9 @@ def disable(actor, cmd, alertkey=None, severity='info'):
 
     keyword.disable(severity, disabledBy=cmd.userID)
 
-    activeMessage = "activeAlerts{}".format(("=" if len(actor.activeAlerts) else "")) +\
-                       ", ".join(["{}".format(a.actorKey) for a in actor.activeAlerts])
-
-    disabledMessage = "disabledAlertRules{}".format(("=" if len(actor.disabledAlerts) else "")) +\
-                       ", ".join(['"({}, {}, {})"'.format(a.actorKey, a.severity, a.disabledBy)
-                                  for a in actor.disabledAlerts])
-
-    cmd.writeToUsers("i", activeMessage)
-    cmd.writeToUsers("i", disabledMessage)
-
-    for a in actor.activeAlerts:
-        a.dispatchAlertMessage()
+    actor.broadcastActive()
+    actor.broadcastDisabled()
+    actor.broadcastAll()
 
     cmd.setState(cmd.Done, 'disabled')
 

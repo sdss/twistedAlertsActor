@@ -21,7 +21,7 @@ __all__ = ('instrumentState')
 @click.argument('state', nargs=1, default='up', type=click.Choice(['up', 'down']))
 @alerts_context
 def instrumentState(actor, cmd, instrument=None, state="up"):
-    """acknowledge an alert"""
+    """set the state of an instrument"""
 
     if state == "down":
         actor.instrumentUp[instrument] = False

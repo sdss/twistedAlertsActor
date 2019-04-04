@@ -22,22 +22,11 @@ def status(actor, cmd):
 
     # print("current model: ", actor.hubModel)
 
-    activeMessage = "activeAlerts{}".format(("=" if len(actor.activeAlerts) else "")) +\
-                       ", ".join(["{}".format(a.actorKey) for a in actor.activeAlerts])
+    actor.broadcastActive()
+    actor.broadcastDisabled()
+    actor.broadcastAll()
+    actor.broadcastInstruments()
 
-    disabledMessage = "disabledAlertRules{}".format(("=" if len(actor.disabledAlerts) else "")) +\
-                       ", ".join(['"({}, {}, {})"'.format(a.actorKey, a.severity, a.disabledBy)
-                                  for a in actor.disabledAlerts])
-
-    cmd.writeToUsers("i", activeMessage)
-    cmd.writeToUsers("i", disabledMessage)
-    
-    for a in actor.activeAlerts:
-        a.dispatchAlertMessage()
-
-    # cmd.writeToUsers("i", "activeAlerts={}".format(len(actor.activeAlerts)))
-    # cmd.writeToUsers("i", "unacknowledged={}".format(len([a for a in actor.activeAlerts if not a.acknowledged])))
-    # cmd.writeToUsers("i", "keywordsWatching={}".format(len(actor.hubModel)))
-    cmd.setState(cmd.Done)
+    cmd.setState(cmd.Done, 'text="Now you know all I know"')
 
     return False
