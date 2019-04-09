@@ -25,8 +25,14 @@ def instrumentState(actor, cmd, instrument=None, state="up"):
 
     if state == "down":
         actor.instrumentUp[instrument] = False
+        for a in actor.activeAlerts:
+            if a.instrument == instrument:
+                a.disable("i")
     else:
         actor.instrumentUp[instrument] = True
+        for a in actor.disabledAlerts:
+            if a.instrument == instrument:
+                a.enable()
 
     actor.broadcastActive()
     actor.broadcastDisabled()

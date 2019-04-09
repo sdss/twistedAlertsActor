@@ -127,21 +127,6 @@ class alertsActor(BaseActor):
         return self.hub.datamodel
 
 
-    # def checkKey(self, newKeyval, actorKey):
-    #     # update to datamodel, what do?
-
-    #     if newKeyval == self.monitoring[actorKey].dangerVal:
-    #         if self.monitoring[actorKey].active:
-    #             # we already know
-    #             return None
-    #         else:
-    #             self.monitoring[actorKey].setActive()
-    #     elif self.monitoring[actorKey].selfClear:
-    #         # if the key changed and its good, then the alert is gone, right?
-    #         # or possibly key changed and its just not bad? this is still fine to do
-    #         self.monitoring[actorKey].clear()
-
-
     def parseAndDispatchCmd(self, cmd):
         """Dispatch the user command. Stolen from BMO."""
 
@@ -253,6 +238,7 @@ class keyState(object):
                acknowledged=ack(self.acknowledged), acknowledger=self.acknowledger)
 
 
+    @property
     def instDown(self):
         if self.instrument is None:
             return False
@@ -271,7 +257,7 @@ class keyState(object):
         self.triggeredTime = time.time()
         self.checkMe.start(self.sleepTime, self.reevaluate)
 
-        if self.instDown():
+        if self.instDown:
             self.disable(self.severity , 0)
             print("!!{} instrument down, no alert!!".format(self.actorKey))
             return None
@@ -366,7 +352,7 @@ class keyState(object):
             self.clear()
 
 
-    def disable(self, severity, disabledBy):
+    def disable(self, disabledBy):
         self.disabled = True
         self.disabledBy = disabledBy
 

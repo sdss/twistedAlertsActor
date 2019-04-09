@@ -29,7 +29,7 @@ def disable(actor, cmd, alertkey=None, severity='info'):
 
     keyword = actor.monitoring[alertkey]
 
-    keyword.disable(severity, disabledBy=cmd.userID)
+    keyword.disable(cmd.userID)
 
     actor.broadcastActive()
     actor.broadcastDisabled()
