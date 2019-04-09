@@ -29,18 +29,23 @@ class wrapCallbacks(object):
 
             if 'heartbeat' in actions.keys():
                 alertKey = actions['heartbeat'] + '.heartbeat'
-                callback = self.pulse(alertKey=alertKey, checkAfter=actions['checkAfter'])
+                self.alertsActor.addKey(alertKey,
+                                        severity=actions['severity'],
+                                        **otherArgs)
+                callback = self.pulse(alertKey=alertKey,
+                                      checkAfter=actions['checkAfter'])
                 self.datamodel_callbacks[key] = callback
 
             else:
                 alertKey = key
+                self.alertsActor.addKey(alertKey,
+                                        severity=actions['severity'],
+                                        **otherArgs)
                 callback = self.updateKey(key)
                 self.datamodel_callbacks[key] = callback
 
             if "instrument" in actions.keys():
                 alertsActor.instrumentUp[actions["instrument"]] = True
-
-            self.alertsActor.addKey(alertKey, severity=actions['severity'], **otherArgs)
 
 
     def pulse(self, alertKey='NOT_SPECIFIED', checkAfter=30):
@@ -58,6 +63,8 @@ class wrapCallbacks(object):
             self.alertsActor.monitoring[alertKey].keyword = newKeyval[0]
             self.alertsActor.monitoring[alertKey].lastalive = time.time()
             self.alertsActor.heartbeats[alertKey].start(checkAfter, deadCallback)
+
+        startTime(["init"])  # call now so it raises error?
 
         return startTime
 

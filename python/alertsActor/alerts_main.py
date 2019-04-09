@@ -245,6 +245,7 @@ class keyState(object):
 
         assert self.severity in ['ok', 'info', 'apogeediskwarn', 'warn', 'serious', 'critical'], "severity level not allowed"
 
+
     @property
     def msg(self):
         return "alert={actorkey}, {severity}, {keyword}, {enable}, {acknowledged}, {acknowledger}".format(actorkey=self.actorKey,
@@ -261,15 +262,19 @@ class keyState(object):
         else:
             return True
 
+
     def setActive(self):
         # something cause a problem, do stuff
-        if self.instDown():
-            print("!!{} instrument down, no alert!!".format(self.actorKey))
-            return None
+        self.acknowledged = False # clear anything from old alert
         self.active = True
         self.severity = self.defaultSeverity
         self.triggeredTime = time.time()
         self.checkMe.start(self.sleepTime, self.reevaluate)
+
+        if self.instDown():
+            self.disable(self.severity , 0)
+            print("!!{} instrument down, no alert!!".format(self.actorKey))
+            return None
 
         self.dispatchAlertMessage()
         self.sendEmail()
