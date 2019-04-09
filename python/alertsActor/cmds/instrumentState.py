@@ -28,6 +28,11 @@ def instrumentState(actor, cmd, instrument=None, state="up"):
     else:
         actor.instrumentUp[instrument] = True
 
+    actor.broadcastActive()
+    actor.broadcastDisabled()
+    actor.broadcastAll()
+    actor.broadcastInstruments()
+
     cmd.setState(cmd.Done, '{} set to {}'.format(instrument, state))
 
     return False
