@@ -1,9 +1,25 @@
 # this file specifies what actor/key pairs raise alerts
 # the actor and key are specified as actor.key
-# for each actor/key, an [cast, action] must be specified
-# actions are pulse, warning, severe, critical
+# for each actor/key, a cast and default severity must be specified
 # casts are how to cast each keyword (e.g. int, str)
 # the extra !!python/etc... is to read it in as a function
+# many other optional keywords are available
+# instrument: an associated insturment. the alert will be disabled
+#             if said instrument is marked "down"
+# heartbeat: use this keyword as a heartbeat (for specified actor)
+# dangerVal: a list of values to raise an alert for, or a single
+#            value if using above/below checker
+# checkAfter: how long to wait before raising heartbeat alert
+# emailAddresses: who to send email alerts to for this keyword
+# phoneNumbers: who to text alerts for this keyword
+# selfClear: is this alert allowed to disappear quietly if 
+#            the conditions go away?
+# checker: how to check alert keys, if one dangerVal isn't enough
+#          if one dangerVal is enough, not needed
+
+# #######################################
+# apogee
+# #######################################
 apogee.ditherPosition: 
   cast: !!python/name:__builtin__.str
   severity: warn
@@ -12,31 +28,37 @@ apogee.ditherPosition:
   emailAddresses: ['j.donor@tcu.edu']
   selfClear: True
   instrument: apogee
+  # the {} is needed it seems. its empty to tell it to pass nothing to __init__
+  checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
 apogee.tempAlarms: 
   cast: !!python/name:__builtin__.str
-  severity: warn
+  severity: critical
   instrument: apogee
 apogee.vacuumAlarm: 
   cast: !!python/name:__builtin__.str
-  severity: warn
+  severity: critical
   instrument: apogee
 apogee.ln2Alarm: 
   cast: !!python/name:__builtin__.str
-  severity: warn
+  severity: critical
   instrument: apogee
 apogee.collIndexer: 
   cast: !!python/name:__builtin__.str
-  severity: warn
+  severity: serious
   instrument: apogee
 apogee.ditherIndexer: 
   cast: !!python/name:__builtin__.str
-  severity: warn
+  severity: serious
   instrument: apogee
+
+# #######################################
+# apogeeql
+# #######################################
 apogeeql.rootURL:
   cast: !!python/name:__builtin__.str
   severity: warn
   heartbeat: apogeeql
-  checkAfter: 15
+  checkAfter: 75
   selfClear: True
 apogeeql.icsDiskAlarm:
   cast: !!python/name:__builtin__.str
@@ -47,6 +69,42 @@ apogeeql.qlDiskAlarm:
 apogeeql.archDiskAlarm:
   cast: !!python/name:__builtin__.str
   severity: warn
+
+# #######################################
+# mcp
+# #######################################
+mcp.ab_status:
+  cast: !!python/name:__builtin__.str
+  severity: serious
+  # checker: needs to be defined, looks like if key[0] == 0
+mcp.needIack:
+  cast: !!python/name:__builtin__.str
+  severity: warn
+  dangerVal: 0
+mcp.userId:
+  cast: !!python/name:__builtin__.str
+  severity: info
+  dangerVal: jeg
+mcp.aliveAt:
+  cast: !!python/name:__builtin__.str
+  severity: warn
+  heartbeat: mcp
+  checkAfter: 75
+  selfClear: True
+
+# #######################################
+# tcc
+# #######################################
+# tcc.tccPos:
+#   cast: !!python/name:__builtin__.str
+#   severity: warn
+#   heartbeat: tcc
+#   checkAfter: 15
+# in the old actor, no TCC keywords raise alerts
+
+# #######################################
+# boss
+# #######################################
 # boss.SP1[RB][0-3]?CCDTemp:
 #   cast:
 # boss.SP2[RB][0-3]?CCDTemp:

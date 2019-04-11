@@ -13,7 +13,6 @@ import yaml
 import click
 import warnings
 
-
 def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
 
     basename = pathlib.Path(filename).name

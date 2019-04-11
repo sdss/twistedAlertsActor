@@ -26,7 +26,7 @@ from alertsActor import __version__, alertActions
 from alertsActor.cmds.cmd_parser import alerts_parser
 from alertsActor.logger import log
 
-from alertsActor.rules import callbackWrapper, mail, sms
+from alertsActor.rules import callbackWrapper, mail, sms, dangerKey
 
 
 class alertsActor(BaseActor):
@@ -195,6 +195,7 @@ def enabled(disabled):
     else:
         return "enabled"
 
+
 class keyState(object):
     '''Keep track of the state of each actor.key'''
 
@@ -209,7 +210,7 @@ class keyState(object):
         self.disabled = False
         self.disabledBy = -1
         self.defaultSeverity = severity
-        self.severity = 'info'
+        self.severity = 'ok'
         self.acknowledged = False
         self.acknowledgeMsg = ""
         self.acknowledger = -1
@@ -227,6 +228,13 @@ class keyState(object):
 
         if "checkAfter" in kwargs:
             self.checkAfter = kwargs.get("checkAfter")
+        else:
+            self.checkAfter = 120
+
+        if "checker" in kwargs:
+            self.checker = kwargs.get("checker")
+        else:
+            self.checker = dangerKey.default()
 
         assert self.severity in ['ok', 'info', 'apogeediskwarn', 'warn', 'serious', 'critical'], "severity level not allowed"
 
@@ -249,11 +257,14 @@ class keyState(object):
             return True
 
 
-    def setActive(self):
+    def setActive(self, severity=None):
         # something cause a problem, do stuff
         self.acknowledged = False # clear anything from old alert
         self.active = True
-        self.severity = self.defaultSeverity
+        if severity is None:
+            self.severity = self.defaultSeverity
+        else:
+            self.severity = severity
         self.triggeredTime = time.time()
         self.checkMe.start(self.sleepTime, self.reevaluate)
 
@@ -270,7 +281,7 @@ class keyState(object):
         # everything good, back to normal
         self.active = False
         self.checkMe = Timer()
-        self.severity = 'info'
+        self.severity = 'ok'
 
         self.alertsActorReference.broadcastActive()
         self.alertsActorReference.broadcastDisabled()
@@ -295,7 +306,12 @@ class keyState(object):
     def reevaluate(self):
         # at some point this will presumably raise alert level?
         # possibly send email? Or only send email for critical? Or...
-        self.checkKey()
+        check = self.checkKey()
+        if check != self.severity:
+            # something changed, treat it like new alert
+            self.severity = check
+            self.acknowledge(acknowledgedBy=0, unack=True)
+            self.dispatchAlertMessage()
         if not self.active:
             return
 
@@ -335,22 +351,16 @@ class keyState(object):
     def checkKey(self):
         # check key, should be called when keyword changes
 
-        if "heartbeat" in self.actorKey:
-            if time.time() - self.lastalive < self.checkAfter:
+        check = self.checker(self)
+
+        if check == "ok":
+            if self.selfClear:
                 self.clear()
-            return None
-
-        if self.keyword == self.dangerVal:
-            if self.active:
-                # we already know
-                return None
             else:
-                self.setActive()
-        elif self.selfClear:
-            # if the key changed and its good, then the alert is gone, right?
-            # or possibly key changed and its just not bad? this is still fine to do
-            self.clear()
-
+                self.severity = "ok"
+        else:
+            if not self.active:
+                self.setActive(check)
 
     def disable(self, disabledBy):
         self.disabled = True
