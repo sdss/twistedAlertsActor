@@ -5,10 +5,8 @@
 #
 # Created by John Donor on 10 April 2019
 
-import time
+import re, time
 from yaml import YAMLObject
-
-__all__ = ("diskCheck", "heartbeatCheck")
 
 
 class diskCheck(YAMLObject):
@@ -31,7 +29,68 @@ class diskCheck(YAMLObject):
         elif  (keyval[0]).upper() == 'CRITICAL':
             return "critical"
         else:
-            return "warning"
+            return "info"
+
+
+class doNothing(object):
+    """camcheck alerts can't check themselves
+
+       dummy class to facilitate that
+    """
+    def __init__(self):
+        pass
+
+
+    def __call__(self, keyState):
+        return keyState.severity
+
+
+class camCheck(YAMLObject):
+    """evaluate a camCheck alert
+    """
+    def __init__(self):
+        self.alertsActor = None
+        self.triggered = list()
+
+
+    def generateCamCheckAlert(self, key, severity):
+        key = "camCheck." + key
+        if key not in self.alertsActor.monitoring:
+            dumbCheck = doNothing()
+            self.alertsActor.addKey(key, severity=severity, sleepTime=120,
+                                    selfClear=False, checker=dumbCheck)
+        self.alertsActor.monitoring[key].setActive(severity)
+
+    def __call__(self, keyState):
+        keyval = keyState.keyword
+        if self.alertsActor is None:
+            self.alertsActor = keyState.alertsActorReference
+
+        for k in keyval:
+            if re.search(r"SP[12][RB][0-3]?CCDTemp", k):
+                generateCamCheckAlert(k, "critical")
+            elif re.search(r"SP[12]SecondaryDewarPress", k):
+                generateCamCheckAlert(k, "critical")
+            elif re.search(r"SP[12](DAQ|Mech|Micro)NotTalking", k):
+                generateCamCheckAlert(k, "critical")
+            elif re.search(r"DACS_SET", k):
+                generateCamCheckAlert(k, "critical")
+            elif re.search(r"SP[12]LN2Fill", k):
+                generateCamCheckAlert(k, "serious")
+            elif re.search(r"SP[12](Exec|Phase)Boot", k):
+                generateCamCheckAlert(k, "serious")
+            else:
+                generateCamCheckAlert(k, "warn")
+
+        for k in self.triggered:
+            if k.split(".")[-1] not in keyval:  # b/c we know its camCheck already
+                self.alertsActor.monitoring[key].severity = "ok"
+                # now it can check itself and find out its cool
+                # and then decide to disappear if its acknowledged, etc etc
+                self.alertsActor.monitoring[key].checkKey()
+
+        # never flag camCheck, always monitored keys
+        return "ok"
 
 
 class heartbeatCheck(YAMLObject):
@@ -56,7 +115,7 @@ class above(YAMLObject):
         pass
 
     def __call__(self, keyState):
-        if keyState.keyword > keyState.dangerVal[0]:
+        if keyState.keyword > keyState.dangerVal:
             return keyState.defaultSeverity
         else:
             return "ok"
@@ -69,11 +128,36 @@ class below(YAMLObject):
         pass
 
     def __call__(self, keyState):
-        if keyState.keyword < keyState.dangerVal[0]:
+        if keyState.keyword < keyState.dangerVal:
             return keyState.defaultSeverity
         else:
             return "ok"
 
+
+class neq(YAMLObject):
+    """literally: is the value too low
+    """
+    def __init__(self):
+        pass
+
+    def __call__(self, keyState):
+        if keyState.keyword != keyState.dangerVal:
+            return keyState.defaultSeverity
+        else:
+            return "ok"
+
+
+class inList(YAMLObject):
+    """is any value in the list "True", e.g. flagged
+    """
+    def __init__(self):
+        pass
+
+    def __call__(self, keyState):
+        if [k for k in keyState.keyword if k]:
+            return keyState.defaultSeverity
+        else:
+            return "ok"
 
 class default(object):
     """check equality to a dangerval

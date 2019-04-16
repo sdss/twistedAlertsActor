@@ -199,8 +199,8 @@ def enabled(disabled):
 class keyState(object):
     '''Keep track of the state of each actor.key'''
 
-    def __init__(self, alertsActor, actorKey='oop.forgot', severity='info', keyword="", dangerVal=None,
-                 selfClear=False, emailAddresses=['fail@fail.com'], **kwargs):
+    def __init__(self, alertsActor, actorKey='oop.forgot', keyword="",
+                 emailAddresses=['fail@fail.com'], **kwargs):
         self.alertsActorReference = alertsActor
         self.triggeredTime = None
         self.actorKey = actorKey
@@ -209,32 +209,22 @@ class keyState(object):
         self.active = False
         self.disabled = False
         self.disabledBy = -1
-        self.defaultSeverity = severity
-        self.severity = 'ok'
+        self.severity = "ok"
         self.acknowledged = False
         self.acknowledgeMsg = ""
         self.acknowledger = -1
-        self.dangerVal = dangerVal  # value on which to raise alert
         self.checkMe = Timer()
-        self.selfClear = selfClear
-        self.sleepTime = 10
         self.emailAddresses = emailAddresses
         self.smtpclient = "localhost:1025"
 
-        if "instrument" in kwargs:
-            self.instrument = kwargs.get("instrument")
-        else:
-            self.instrument = None
-
-        if "checkAfter" in kwargs:
-            self.checkAfter = kwargs.get("checkAfter")
-        else:
-            self.checkAfter = 120
-
-        if "checker" in kwargs:
-            self.checker = kwargs.get("checker")
-        else:
-            self.checker = dangerKey.default()
+        # kwargs, second argument is the default
+        self.defaultSeverity = kwargs.get("severity", "info")
+        self.dangerVal = kwargs.get("dangerVal", None)
+        self.selfClear = kwargs.get("selfClear", False)
+        self.sleepTime = kwargs.get("sleepTime", 10)
+        self.instrument = kwargs.get("instrument", None)
+        self.checkAfter = kwargs.get("checkAfter", 120)
+        self.checker = kwargs.get("checker", dangerKey.default())
 
         assert self.severity in ['ok', 'info', 'apogeediskwarn', 'warn', 'serious', 'critical'], "severity level not allowed"
 
