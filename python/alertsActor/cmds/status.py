@@ -20,7 +20,7 @@ __all__ = ('status')
 def status(actor, cmd):
     """returns actor status"""
 
-    # print("current model: ", actor.hubModel)
+    print("current model: ", actor.hubModel)
 
     actor.broadcastActive()
     actor.broadcastDisabled()

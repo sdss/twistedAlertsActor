@@ -164,7 +164,9 @@ class alertsActor(BaseActor):
             # this is definitely bad form, but we're trying not to change
             # stui yet
             # click is case sensetive and requires lower-case -_-
-            args = [a.split("=")[-1].lower() for a in cmd.cmdBody.split()]
+            # except keywords are often camelCase. Ugh.... Starting to dislike click
+            args = [a.lower() if not "=" in a else a for a in cmd.cmdBody.split() ]
+            args = [a.split("=")[-1] for a in args]
             result = test_cmd(args)
             if result is False:
                 return
@@ -194,6 +196,14 @@ def enabled(disabled):
         return "disabled"
     else:
         return "enabled"
+
+
+def parseKey(keyVal):
+    """readable keyVal"""
+    if type(keyVal) is list:
+        return "[{}]".format("".join(["{}.".format(i) for i in keyVal]))
+    else:
+        return str(keyVal)
 
 
 class keyState(object):
@@ -231,8 +241,8 @@ class keyState(object):
 
     @property
     def msg(self):
-        return "alert={actorkey}, {severity}, {keyword}, {enable}, {acknowledged}, {acknowledger}".format(actorkey=self.actorKey,
-               keyword=self.keyword, severity=self.severity, enable=enabled(self.disabled),
+        return "alert={actorKey}, {severity}, {keyword}, {enable}, {acknowledged}, {acknowledger}".format(actorKey=self.actorKey,
+               keyword=parseKey(self.keyword), severity=self.severity, enable=enabled(self.disabled),
                acknowledged=ack(self.acknowledged), acknowledger=self.acknowledger)
 
 
@@ -297,6 +307,7 @@ class keyState(object):
         # at some point this will presumably raise alert level?
         # possibly send email? Or only send email for critical? Or...
         check = self.checkKey()
+        print("evaluated {} found {} default {}".format(self.actorKey, check, self.defaultSeverity))
         if check != self.severity:
             # something changed, treat it like new alert
             self.severity = check
@@ -351,6 +362,8 @@ class keyState(object):
         else:
             if not self.active:
                 self.setActive(check)
+
+        return check
 
     def disable(self, disabledBy):
         self.disabled = True

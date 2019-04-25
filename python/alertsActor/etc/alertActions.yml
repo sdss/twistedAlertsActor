@@ -24,24 +24,26 @@ apogee.ditherPosition:
   cast: !!python/name:__builtin__.str
   severity: warn
   heartbeat: apogee
-  checkAfter: 15
+  checkAfter: 30
   emailAddresses: ['j.donor@tcu.edu']
   selfClear: True
   instrument: apogee
   # the {} is needed it seems. its empty to tell it to pass nothing to __init__
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
 apogee.tempAlarms: 
-  cast: !!python/name:__builtin__.list
+  cast: !!python/name:__builtin__.int
+  # cast: !!python/object:alertsActor.rules.specialCasts.listElem
+  #   {cast: !!python/name:__builtin__.int }
   severity: critical
   instrument: apogee
   checker: !!python/object:alertsActor.rules.dangerKey.inList {}
 apogee.vacuumAlarm: 
-  cast: !!python/name:__builtin__.bool
+  cast: !!python/name:__builtin__.int
   dangerVal: 1
   severity: critical
   instrument: apogee
 apogee.ln2Alarm: 
-  cast: !!python/name:__builtin__.bool
+  cast: !!python/name:__builtin__.int
   dangerVal: 1
   severity: critical
   instrument: apogee
@@ -56,75 +58,76 @@ apogee.ditherIndexer:
   severity: serious
   instrument: apogee
 
-# #######################################
-# apogeeql
-# #######################################
-apogeeql.rootURL:
-  cast: !!python/name:__builtin__.str
-  severity: warn
-  heartbeat: apogeeql
-  checkAfter: 75
-  selfClear: True
-  checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
-apogeeql.icsDiskAlarm:
-  cast: !!python/name:__builtin__.str
-  severity: warn
-  checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
-apogeeql.qlDiskAlarm:
-  cast: !!python/name:__builtin__.str
-  severity: warn
-  checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
-apogeeql.archDiskAlarm:
-  cast: !!python/name:__builtin__.str
-  severity: warn
-  checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
-
-# #######################################
-# mcp
-# #######################################
-mcp.ab_status:
-  cast: !!python/object:alertsActor.rules.specialCasts.firstElem {cast: int}
-  severity: serious
-  dangerVal: 0
-  checker: !!python/object:alertsActor.rules.dangerKey.neq {}
-mcp.needIack:
-  cast: !!python/name:__builtin__.int
-  severity: warn
-  dangerVal: 0
-  checker: !!python/object:alertsActor.rules.dangerKey.neq {}
-mcp.userId:
-  cast: !!python/name:__builtin__.str
-  severity: info
-  dangerVal: jeg
-mcp.aliveAt:
-  cast: !!python/name:__builtin__.str
-  severity: warn
-  heartbeat: mcp
-  checkAfter: 75
-  selfClear: True
-  checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
-
-# #######################################
-# tcc
-# #######################################
-# tcc.tccPos:
+# # #######################################
+# # apogeeql
+# # #######################################
+# apogeeql.rootURL:
 #   cast: !!python/name:__builtin__.str
 #   severity: warn
-#   heartbeat: tcc
-#   checkAfter: 15
-# in the old actor, no TCC keywords raise alerts
+#   heartbeat: apogeeql
+#   checkAfter: 75
+#   selfClear: True
+#   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
+# apogeeql.icsDiskAlarm:
+#   cast: !!python/name:__builtin__.str
+#   severity: warn
+#   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
+# apogeeql.qlDiskAlarm:
+#   cast: !!python/name:__builtin__.str
+#   severity: warn
+#   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
+# apogeeql.archDiskAlarm:
+#   cast: !!python/name:__builtin__.str
+#   severity: warn
+#   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 
-# #######################################
-# boss
-# #######################################
-boss.aliveAt:
-  cast: !!python/name:__builtin__.int
-  severity: warn
-  heartbeat: boss
-  checkAfter: 75
-  selfClear: True
-  checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
-boss.camCheck:
-  cast: !!python/name:__builtin__.list  # possibly tuple!
-  severity: warn
-  checker: !!python/object:alertsActor.rules.dangerKey.camCheck {}
+# # #######################################
+# # mcp
+# # #######################################
+# mcp.ab_status:
+#   cast: !!python/object:alertsActor.rules.specialCasts.firstElem
+#     {cast: !!python/name:__builtin__.int }
+#   severity: serious
+#   dangerVal: 0
+#   checker: !!python/object:alertsActor.rules.dangerKey.neq {}
+# mcp.needIack:
+#   cast: !!python/name:__builtin__.int
+#   severity: warn
+#   dangerVal: 0
+#   checker: !!python/object:alertsActor.rules.dangerKey.neq {}
+# mcp.userId:
+#   cast: !!python/name:__builtin__.str
+#   severity: info
+#   dangerVal: jeg
+# mcp.aliveAt:
+#   cast: !!python/name:__builtin__.str
+#   severity: warn
+#   heartbeat: mcp
+#   checkAfter: 75
+#   selfClear: True
+#   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
+
+# # #######################################
+# # tcc
+# # #######################################
+# # tcc.tccPos:
+# #   cast: !!python/name:__builtin__.str
+# #   severity: warn
+# #   heartbeat: tcc
+# #   checkAfter: 15
+# # in the old actor, no TCC keywords raise alerts
+
+# # #######################################
+# # boss
+# # #######################################
+# boss.aliveAt:
+#   cast: !!python/name:__builtin__.int
+#   severity: warn
+#   heartbeat: boss
+#   checkAfter: 75
+#   selfClear: True
+#   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
+# boss.camCheck:
+#   cast: !!python/name:__builtin__.list  # possibly tuple!
+#   severity: warn
+#   checker: !!python/object:alertsActor.rules.dangerKey.camCheck {}
