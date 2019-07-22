@@ -7,6 +7,9 @@ except ImportError:
 
 import yaml
 
+# Inits the logging system. Only shell logging, and exception and warning catching.
+# File logging can be started by calling log.start_file_logger(name).
+from .utils import get_logger
 
 # Monkeypatches formatwarning and error handling
 
@@ -28,8 +31,10 @@ warnings.filterwarnings(
 
 
 # Loads config
-config = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alerts.cfg')))
+config = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alerts.cfg')), 
+					Loader=yaml.FullLoader)
 
-alertActions = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alertActions.yml')))
+alertActions = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alertActions.yml')), 
+					Loader=yaml.UnsafeLoader)
 
 __version__ = '0.0.1'

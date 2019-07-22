@@ -29,14 +29,14 @@ apogee.ditherPosition:
   selfClear: True
   instrument: apogee
   # the {} is needed it seems. its empty to tell it to pass nothing to __init__
-  checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
+  checker: !!python/object/new:alertsActor.rules.dangerKey.heartbeatCheck {}
 apogee.tempAlarms: 
   cast: !!python/name:__builtin__.int
   # cast: !!python/object:alertsActor.rules.specialCasts.listElem
   #   {cast: !!python/name:__builtin__.int }
   severity: critical
   instrument: apogee
-  checker: !!python/object:alertsActor.rules.dangerKey.inList {}
+  checker: !!python/object/new:alertsActor.rules.dangerKey.inList {}
 apogee.vacuumAlarm: 
   cast: !!python/name:__builtin__.int
   dangerVal: 1
