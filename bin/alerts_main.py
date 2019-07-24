@@ -15,7 +15,7 @@ import logging
 from twisted.internet import reactor
 
 from alertsActor import config, __version__
-from alertsActor.logger import log
+# from alertsActor.logger import log
 from alertsActor.alerts_main import alertsActor
 
 import click
@@ -29,9 +29,9 @@ def alerts_cmd(debug=False):
 
     port = config['tron']['port']
 
-    if debug:
-        log.sh.setLevel(logging.DEBUG)
-        log.debug('alertsActor started in debug mode.')
+    # if debug:
+        # log.sh.setLevel(logging.DEBUG)
+        # log.debug('alertsActor started in debug mode.')
 
     alertsActor(config, userPort=port, version=__version__)
 

@@ -31,10 +31,16 @@ warnings.filterwarnings(
 
 
 # Loads config
-config = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alerts.cfg')), 
-					Loader=yaml.FullLoader)
+try:
+    config = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alerts.cfg')), 
+                        Loader=yaml.FullLoader)
 
-alertActions = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alertActions.yml')), 
-					Loader=yaml.UnsafeLoader)
+    alertActions = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alertActions.yml')), 
+                        Loader=yaml.UnsafeLoader)
+except AttributeError:
+    # using pyyaml < 5, enforce old behavior
+    config = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alerts.cfg')))
+
+    alertActions = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alertActions.yml')))
 
 __version__ = '0.0.1'
