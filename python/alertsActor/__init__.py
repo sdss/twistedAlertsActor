@@ -5,6 +5,7 @@ try:
 except ImportError:
     import pathlib2 as pathlib
 
+import os
 import yaml
 
 # Inits the logging system. Only shell logging, and exception and warning catching.
@@ -31,16 +32,29 @@ warnings.filterwarnings(
 
 
 # Loads config
+
+if os.path.isfile(os.path.expanduser("~/.alertsConfig.yaml")):
+    configFile = os.path.expanduser("~/.alertsConfig.yaml")
+else:
+    print("Local config not found! Using default")
+    configFile = str(pathlib.Path(__file__).parent / 'etc/alerts.cfg')
+
+if os.path.isfile(os.path.expanduser("~/.alertActions.yaml")):
+    actionsFile = os.path.expanduser("~/.alertActions.yaml")
+else:
+    print("Local alert actions not found! Using default")
+    actionsFile = str(pathlib.Path(__file__).parent / 'etc/alertActions.yml')
+
 try:
-    config = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alerts.cfg')), 
+    config = yaml.load(open(configFile), 
                         Loader=yaml.FullLoader)
 
-    alertActions = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alertActions.yml')), 
+    alertActions = yaml.load(open(actionsFile), 
                         Loader=yaml.UnsafeLoader)
 except AttributeError:
     # using pyyaml < 5, enforce old behavior
-    config = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alerts.cfg')))
+    config = yaml.load(open(configFile))
 
-    alertActions = yaml.load(open(str(pathlib.Path(__file__).parent / 'etc/alertActions.yml')))
+    alertActions = yaml.load(open(actionsFile))
 
 __version__ = '0.0.1'

@@ -225,7 +225,9 @@ class keyState(object):
         self.acknowledger = -1
         self.checkMe = Timer()
         self.emailAddresses = emailAddresses
-        self.smtpclient = "localhost:1025"
+        # self.smtpclient = "localhost:1025"
+        self.smtpclient = alertsActor.config["email"]["mailClient"]
+
 
         # kwargs, second argument is the default
         self.defaultSeverity = kwargs.get("severity", "info")
@@ -333,7 +335,7 @@ class keyState(object):
         # notify over email
         mail.sendEmail(self, self.smtpclient)
         # and sms?
-        # sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
+        sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
 
 
     def dispatchAlertMessage(self):
