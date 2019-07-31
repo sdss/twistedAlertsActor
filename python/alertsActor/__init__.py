@@ -33,14 +33,14 @@ warnings.filterwarnings(
 
 # Loads config
 
-if os.path.isfile(os.path.expanduser("~/.alertsConfig.yaml")):
-    configFile = os.path.expanduser("~/.alertsConfig.yaml")
+if os.path.isfile(os.path.expanduser("~/.alertsConfig.yml")):
+    configFile = os.path.expanduser("~/.alertsConfig.yml")
 else:
     print("Local config not found! Using default")
     configFile = str(pathlib.Path(__file__).parent / 'etc/alerts.cfg')
 
-if os.path.isfile(os.path.expanduser("~/.alertActions.yaml")):
-    actionsFile = os.path.expanduser("~/.alertActions.yaml")
+if os.path.isfile(os.path.expanduser("~/.alertActions.yml")):
+    actionsFile = os.path.expanduser("~/.alertActions.yml")
 else:
     print("Local alert actions not found! Using default")
     actionsFile = str(pathlib.Path(__file__).parent / 'etc/alertActions.yml')
