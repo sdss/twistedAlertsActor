@@ -55,6 +55,8 @@ class alertsActor(BaseActor):
         self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts,
                                      datamodel_callbacks=self.callbacks.datamodel_callbacks)
 
+        print(self.hubModel)
+
         # log.info('starting alertsActor actor version={!r} in port={}'
         #          .format(__version__, kwargs['userPort']))
 
@@ -131,10 +133,12 @@ class alertsActor(BaseActor):
         """Dispatch the user command. Stolen from BMO."""
 
         def test_cmd(args):
+            print("t ", args)
             result = CliRunner().invoke(alerts_parser, args)
             if result.exit_code > 0:
                 # If code > 0, there was an error. We fail the command and inform the users.
                 textMsg = result.output
+                print("f message", textMsg)
                 for line in textMsg.splitlines():
                     line = json.dumps(line).replace(';', '')
                     cmd.writeToUsers('w', 'text={0}'.format(line))
@@ -165,12 +169,17 @@ class alertsActor(BaseActor):
             # stui yet
             # click is case sensetive and requires lower-case -_-
             # except keywords are often camelCase. Ugh.... Starting to dislike click
-            args = [a.lower() if not "=" in a else a for a in cmd.cmdBody.split() ]
+            args = [a.lower() if not "=" in a else a for a in cmd.cmdBody.split()]
             args = [a.split("=")[-1] for a in args]
-            result = test_cmd(args)
+            if "obs" in args[0]:
+                temp_args = args[2:]
+            else:
+                temp_args = args
+            print(temp_args)
+            result = test_cmd(temp_args)
             if result is False:
                 return
-            alerts_parser(args, obj=dict(actor=self, cmd=cmd))
+            alerts_parser(temp_args, obj=dict(actor=self, cmd=cmd))
         except CommandError as ee:
             cmd.setState('failed', textMsg=strFromException(ee))
             return
@@ -233,7 +242,6 @@ class keyState(object):
         self.defaultSeverity = kwargs.get("severity", "info")
         self.dangerVal = kwargs.get("dangerVal", None)
         self.selfClear = kwargs.get("selfClear", False)
-        self.sleepTime = kwargs.get("sleepTime", 10)
         self.instrument = kwargs.get("instrument", None)
         self.checkAfter = kwargs.get("checkAfter", 120)
         self.checker = kwargs.get("checker", dangerKey.default())
@@ -268,7 +276,7 @@ class keyState(object):
         else:
             self.severity = severity
         self.triggeredTime = time.time()
-        self.checkMe.start(self.sleepTime, self.reevaluate)
+        self.checkMe.start(self.checkAfter, self.reevaluate)
 
         if self.instDown:
             self.disable(self.severity , 0)
@@ -276,7 +284,7 @@ class keyState(object):
             return None
 
         self.dispatchAlertMessage()
-        self.sendEmail()
+        # self.sendEmail()
 
 
     def clear(self):
@@ -320,15 +328,15 @@ class keyState(object):
 
         if self.acknowledged:
             # keep checking myself until I go away
-            self.checkMe.start(self.sleepTime, self.reevaluate)
+            self.checkMe.start(self.checkAfter, self.reevaluate)
             return
 
         if self.disabled:
-            self.checkMe.start(self.sleepTime, self.reevaluate)
+            self.checkMe.start(self.checkAfter, self.reevaluate)
             return
 
         self.dispatchAlertMessage()
-        self.checkMe.start(self.sleepTime, self.reevaluate)
+        self.checkMe.start(self.checkAfter, self.reevaluate)
 
 
     def sendEmail(self):

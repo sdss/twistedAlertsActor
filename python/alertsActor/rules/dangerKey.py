@@ -49,16 +49,17 @@ class camCheck(YAMLObject):
     """evaluate a camCheck alert
     """
     def __init__(self):
-        self.alertsActor = None
-        self.triggered = list()
+        # NEVER GETS CALLED!!!! -_-
+        pass
 
 
     def generateCamCheckAlert(self, key, severity):
         key = "camCheck." + key
         if key not in self.alertsActor.monitoring:
             dumbCheck = doNothing()
-            self.alertsActor.addKey(key, severity=severity, sleepTime=120,
-                                    selfClear=False, checker=dumbCheck)
+            self.alertsActor.addKey(key, severity=severity, checkAfter=120,
+                                    selfClear=False, checker=dumbCheck,
+                                    keyword="'Reported by camCheck'")
         self.alertsActor.monitoring[key].setActive(severity)
 
     def __call__(self, keyState):
@@ -68,19 +69,19 @@ class camCheck(YAMLObject):
 
         for k in keyval:
             if re.search(r"SP[12][RB][0-3]?CCDTemp", k):
-                generateCamCheckAlert(k, "critical")
+                self.generateCamCheckAlert(k, "critical")
             elif re.search(r"SP[12]SecondaryDewarPress", k):
-                generateCamCheckAlert(k, "critical")
+                self.generateCamCheckAlert(k, "critical")
             elif re.search(r"SP[12](DAQ|Mech|Micro)NotTalking", k):
-                generateCamCheckAlert(k, "critical")
+                self.generateCamCheckAlert(k, "critical")
             elif re.search(r"DACS_SET", k):
-                generateCamCheckAlert(k, "critical")
+                self.generateCamCheckAlert(k, "critical")
             elif re.search(r"SP[12]LN2Fill", k):
-                generateCamCheckAlert(k, "serious")
+                self.generateCamCheckAlert(k, "serious")
             elif re.search(r"SP[12](Exec|Phase)Boot", k):
-                generateCamCheckAlert(k, "serious")
+                self.generateCamCheckAlert(k, "serious")
             else:
-                generateCamCheckAlert(k, "warn")
+                self.generateCamCheckAlert(k, "warn")
 
         for k in self.triggered:
             if k.split(".")[-1] not in keyval:  # b/c we know its camCheck already

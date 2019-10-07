@@ -20,7 +20,17 @@ __all__ = ('status')
 def status(actor, cmd):
     """returns actor status"""
 
-    print("current model: ", actor.hubModel)
+    print("current model: ")
+    for k, v in actor.hubModel.items():
+        # if "boss" in k:
+        #     for bk, bv in v.items():
+        #         if bk not in ["camcheck", "alive at"]:
+        #             continue
+        #         print(bk, bv)
+        #         print("\n")
+        # else:
+        print(k, v)
+        print("\n \n")
 
     actor.broadcastActive()
     actor.broadcastDisabled()
