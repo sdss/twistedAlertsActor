@@ -20,6 +20,7 @@ from click.testing import CliRunner
 
 from RO.StringUtil import strFromException
 from RO.Comm.TwistedTimer import Timer
+from opscore.utility.qstr import qstr
 from twistedActor import BaseActor, CommandError, UserCmd
 
 from alertsActor import __version__, alertActions
@@ -224,7 +225,7 @@ class keyState(object):
         self.triggeredTime = None
         self.actorKey = actorKey
         self.keyword = keyword
-        self.lastalive = time.time()  # updated for heartbeats
+        # self.lastalive = time.time() not used?  # updated for heartbeats
         self.active = False
         self.disabled = False
         self.disabledBy = -1
@@ -249,11 +250,16 @@ class keyState(object):
         assert self.severity in ['ok', 'info', 'apogeediskwarn', 'warn', 'serious', 'critical'], "severity level not allowed"
 
 
+    def keywordFmt(self):
+        instring = 'at {time} found {keyword}'.format(keyword=parseKey(self.keyword), time=self.triggeredTime)
+        return qstr(instring)
+
     @property
     def msg(self):
-        return "alert={actorKey}, {severity}, {keyword}, {enable}, {acknowledged}, {acknowledger}".format(actorKey=self.actorKey,
-               keyword=parseKey(self.keyword), severity=self.severity, enable=enabled(self.disabled),
-               acknowledged=ack(self.acknowledged), acknowledger=self.acknowledger)
+        return "alert={actorKey}, {severity}, {value}, {enable}, {acknowledged}, {acknowledger}".format(
+               actorKey=self.actorKey, value=self.keywordFmt(),
+               severity=self.severity, enable=enabled(self.disabled), acknowledged=ack(self.acknowledged),
+               acknowledger=self.acknowledger)
 
 
     @property
@@ -275,7 +281,7 @@ class keyState(object):
             self.severity = self.defaultSeverity
         else:
             self.severity = severity
-        self.triggeredTime = time.time()
+        self.triggeredTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         self.checkMe.start(self.checkAfter, self.reevaluate)
 
         if self.instDown:
@@ -292,6 +298,7 @@ class keyState(object):
         self.active = False
         self.checkMe = Timer()
         self.severity = 'ok'
+        self.triggeredTime = None
 
         self.alertsActorReference.broadcastActive()
         self.alertsActorReference.broadcastDisabled()
