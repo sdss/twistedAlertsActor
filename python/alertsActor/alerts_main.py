@@ -172,7 +172,8 @@ class alertsActor(BaseActor):
             # except keywords are often camelCase. Ugh.... Starting to dislike click
             args = [a.lower() if not "=" in a else a for a in cmd.cmdBody.split()]
             args = [a.split("=")[-1] for a in args]
-            if "obs" in args[0]:
+            # current tron config passes user, we aren't handling that yet
+            if "." in args[0]:
                 temp_args = args[2:]
             else:
                 temp_args = args
@@ -285,7 +286,7 @@ class keyState(object):
         self.checkMe.start(self.checkAfter, self.reevaluate)
 
         if self.instDown:
-            self.disable(self.severity , 0)
+            self.disable(0)
             print("!!{} instrument down, no alert!!".format(self.actorKey))
             return None
 
