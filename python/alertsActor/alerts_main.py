@@ -174,14 +174,16 @@ class alertsActor(BaseActor):
             args = [a.split("=")[-1] for a in args]
             # current tron config passes user, we aren't handling that yet
             if "." in args[0]:
+                user = args[0]
                 temp_args = args[2:]
             else:
+                user = "?.?"
                 temp_args = args
             print(temp_args)
             result = test_cmd(temp_args)
             if result is False:
                 return
-            alerts_parser(temp_args, obj=dict(actor=self, cmd=cmd))
+            alerts_parser(temp_args, obj=dict(actor=self, cmd=cmd, user=user))
         except CommandError as ee:
             cmd.setState('failed', textMsg=strFromException(ee))
             return

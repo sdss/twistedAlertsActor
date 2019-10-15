@@ -20,14 +20,14 @@ __all__ = ('instrumentState')
 @click.argument('instrument', nargs=1, default=None, required=True)
 @click.argument('state', nargs=1, default='up', type=click.Choice(['up', 'down']))
 @alerts_context
-def instrumentState(actor, cmd, instrument=None, state="up"):
+def instrumentState(actor, cmd, user, instrument=None, state="up"):
     """set the state of an instrument"""
 
     if state == "down":
         actor.instrumentUp[instrument] = False
         for a in actor.activeAlerts:
             if a.instrument == instrument:
-                a.disable("i")
+                a.disable(user)
     else:
         actor.instrumentUp[instrument] = True
         for a in actor.disabledAlerts:

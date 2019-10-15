@@ -21,7 +21,7 @@ __all__ = ('version')
 
 @click.command()
 @alerts_context
-def version(actor, cmd):
+def version(actor, cmd, user):
     """Returns the version."""
 
     cmd.writeToUsers('i', 'version="{0}"'.format(__version__))

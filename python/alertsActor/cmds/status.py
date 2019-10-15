@@ -17,7 +17,7 @@ __all__ = ('status')
 
 @click.command()
 @alerts_context
-def status(actor, cmd):
+def status(actor, cmd, user):
     """returns actor status"""
 
     print("current model: ")

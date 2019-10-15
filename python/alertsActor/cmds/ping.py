@@ -20,7 +20,7 @@ __all__ = ('ping')
 
 @click.command()
 @alerts_context
-def ping(actor, cmd):
+def ping(actor, cmd, user):
     """Pings the actor."""
 
     for k, a in actor.monitoring.items():

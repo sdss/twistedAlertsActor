@@ -22,7 +22,7 @@ __all__ = ('unacknowledge')
                 type=click.Choice(['ok', 'info', 'apogeediskwarn','warn', 'serious', 'critical']))
 @click.option('-m', '--message', multiple=True, default=None, help='a short message to hang on to')
 @alerts_context
-def unacknowledge(actor, cmd, alertkey=None, severity='info', message=None):
+def unacknowledge(actor, cmd, user, alertkey=None, severity='info', message=None):
     """unacknowledge an alert"""
 
     if isinstance(alertkey, unicode):
@@ -40,7 +40,7 @@ def unacknowledge(actor, cmd, alertkey=None, severity='info', message=None):
     else:
         msg = None
 
-    keyword.acknowledge(msg=msg, acknowledgedBy=cmd.userID, unack=True)
+    keyword.acknowledge(msg=msg, acknowledgedBy=user, unack=True)
     cmd.setState(cmd.Done, 'unacknowledged')
 
     return False

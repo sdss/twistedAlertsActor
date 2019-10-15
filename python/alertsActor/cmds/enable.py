@@ -21,7 +21,7 @@ __all__ = ('enable')
 @click.argument('severity', nargs=1, default='info', 
                 type=click.Choice(['ok', 'info', 'apogeediskwarn','warn', 'serious', 'critical']))
 @alerts_context
-def enable(actor, cmd, alertkey=None, severity='info'):
+def enable(actor, cmd, user, alertkey=None, severity='info'):
     """enable an alert"""
 
     if isinstance(alertkey, unicode):
