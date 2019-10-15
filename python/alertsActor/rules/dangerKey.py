@@ -23,7 +23,7 @@ class diskCheck(YAMLObject):
         if (keyval[0]).upper() == 'OK':
             return "ok"
         elif  (keyval[0]).upper() == 'WARNING':
-            return "warning"
+            return "warn"
         elif  (keyval[0]).upper() == 'SERIOUS':
             return "serious"
         elif  (keyval[0]).upper() == 'CRITICAL':
@@ -106,7 +106,7 @@ class heartbeatCheck(YAMLObject):
         elif time.time() - keyState.lastalive > 5*keyState.checkAfter:
             return "serious"
         else:
-            return "warning"
+            return "warn"
 
 
 class above(YAMLObject):
