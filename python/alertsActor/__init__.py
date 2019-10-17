@@ -31,6 +31,9 @@ warnings.filterwarnings(
     'ignore', 'Matplotlib is building the font cache using fc-list. This may take a moment.')
 
 
+log = get_logger('alerts')
+
+
 # Loads config
 
 if os.path.isfile(os.path.expanduser("~/.alertsConfig.yml")):

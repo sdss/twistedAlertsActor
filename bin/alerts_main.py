@@ -29,7 +29,8 @@ def alerts_cmd(debug=False):
 
     port = config['tron']['port']
 
-    # if debug:
+    if debug:
+    	print("debug not treated specially at the moment. TODO?")
         # log.sh.setLevel(logging.DEBUG)
         # log.debug('alertsActor started in debug mode.')
 

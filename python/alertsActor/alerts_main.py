@@ -25,7 +25,7 @@ from twistedActor import BaseActor, CommandError, UserCmd
 
 from alertsActor import __version__, alertActions
 from alertsActor.cmds.cmd_parser import alerts_parser
-# from alertsActor.logger import log
+from alertsActor import log
 
 from alertsActor.rules import callbackWrapper, mail, sms, dangerKey
 
@@ -56,13 +56,11 @@ class alertsActor(BaseActor):
         self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts,
                                      datamodel_callbacks=self.callbacks.datamodel_callbacks)
 
-        print(self.hubModel)
+        log.start_file_logger("~/alertsLog.txt")
 
-        # log.info('starting alertsActor actor version={!r} in port={}'
-        #          .format(__version__, kwargs['userPort']))
+        log.info('starting alertsActor actor version={!r} in port={}'
+                 .format(__version__, kwargs['userPort']))
 
-        # Sets itself as the default actor to write to when logging.
-        # log.set_actor(self)
 
 
     def addKey(self, key, severity, **kwargs):
