@@ -45,8 +45,8 @@ class alertsActor(BaseActor):
 
         # keep track of downed instruments
         # since its either up or down, make boolean
-        # UP = True, DOWN = False
-        self.instrumentUp = dict()
+        # UP = False, DOWN = True
+        self.instrumentDown = dict()
 
         # keep track of heartbeats
         self.heartbeats = dict()
@@ -108,9 +108,11 @@ class alertsActor(BaseActor):
     def broadcastInstruments(self):
         instruments = list()
         for k, a in self.monitoring.items():
-            if a.instrument is not None and not a.instrument in instruments:
-                instruments.append(a.instrument)
-        down = [i for i in instruments if not self.instrumentUp[i]]
+            if a.instruments is not None:
+                for i in a.instruments:
+                    if i not in instruments:
+                        instruments.append(i)
+        down = [i for i in instruments if self.instrumentDown[i]]
         self.writeToUsers("i", 'instrumentNames={}'.format(",".join(instruments)))
         self.writeToUsers("i", 'downInstruments={}'.format(",".join(down)))
 
@@ -137,7 +139,6 @@ class alertsActor(BaseActor):
             if result.exit_code > 0:
                 # If code > 0, there was an error. We fail the command and inform the users.
                 textMsg = result.output
-                print("f message", textMsg)
                 for line in textMsg.splitlines():
                     line = json.dumps(line).replace(';', '')
                     cmd.writeToUsers('w', 'text={0}'.format(line))
@@ -177,12 +178,13 @@ class alertsActor(BaseActor):
             else:
                 user = "?.?"
                 temp_args = args
-            print(temp_args)
+            log.info('{} issued {}'.format(user, temp_args))
             result = test_cmd(temp_args)
             if result is False:
                 return
             alerts_parser(temp_args, obj=dict(actor=self, cmd=cmd, user=user))
         except CommandError as ee:
+            log.warning("command {} failed with {}".format(cmd.cmdStr, strFromException(ee)))
             cmd.setState('failed', textMsg=strFromException(ee))
             return
         except Exception as ee:
@@ -190,10 +192,12 @@ class alertsActor(BaseActor):
             traceback.print_exc(file=sys.stderr)
             textMsg = strFromException(ee)
             hubMsg = 'Exception={0}'.format(ee.__class__.__name__)
+            log.warning("command {} failed with {}".format(cmd.cmdStr, strFromException(ee.__class__.__name__)))
             cmd.setState("failed", textMsg=textMsg, hubMsg=hubMsg)
         except BaseException:
             # This catches the SystemExit that Click insists in returning.
             pass
+
 
 def ack(acknowledged):
     if acknowledged:
@@ -226,7 +230,7 @@ class keyState(object):
         self.triggeredTime = None
         self.actorKey = actorKey
         self.keyword = keyword
-        # self.lastalive = time.time() not used?  # updated for heartbeats
+        self.lastalive = time.time()  # updated for heartbeats
         self.active = False
         self.disabled = False
         self.disabledBy = -1
@@ -239,12 +243,11 @@ class keyState(object):
         # self.smtpclient = "localhost:1025"
         self.smtpclient = alertsActor.config["email"]["mailClient"]
 
-
         # kwargs, second argument is the default
         self.defaultSeverity = kwargs.get("severity", "info")
         self.dangerVal = kwargs.get("dangerVal", None)
         self.selfClear = kwargs.get("selfClear", False)
-        self.instrument = kwargs.get("instrument", None)
+        self.instruments = kwargs.get("instruments", None)
         self.checkAfter = kwargs.get("checkAfter", 120)
         self.checker = kwargs.get("checker", dangerKey.default())
 
@@ -265,13 +268,14 @@ class keyState(object):
 
     @property
     def instDown(self):
-        if self.instrument is None:
+        if self.instruments is None:
             return False
 
-        if self.alertsActorReference.instrumentUp[self.instrument]:
-            return False
+        for i in self.instruments:
+            if self.alertsActorReference.instrumentDown[i]:
+                return True
         else:
-            return True
+            return False
 
 
     def setActive(self, severity=None):
@@ -287,11 +291,11 @@ class keyState(object):
 
         if self.instDown:
             self.disable(0)
-            print("!!{} instrument down, no alert!!".format(self.actorKey))
+            log.info("NO ALERT: {} instrument down, no alert!!".format(self.actorKey))
             return None
 
         self.dispatchAlertMessage()
-        # self.sendEmail()
+        self.sendEmail()
 
 
     def clear(self):
@@ -351,7 +355,7 @@ class keyState(object):
         # notify over email
         mail.sendEmail(self, self.smtpclient)
         # and sms?
-        sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
+        # sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
 
 
     def dispatchAlertMessage(self):
@@ -365,6 +369,8 @@ class keyState(object):
             broadcastSeverity = 'i'
 
         self.alertsActorReference.writeToUsers(broadcastSeverity, self.msg)
+
+        log.info("ALERT! "+ self.msg)
 
 
     def checkKey(self):

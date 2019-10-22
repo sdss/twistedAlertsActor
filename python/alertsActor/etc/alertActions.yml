@@ -4,8 +4,9 @@
 # casts are how to cast each keyword (e.g. int, str)
 # the extra !!python/etc... is to read it in as a function
 # many other optional keywords are available
-# instrument: an associated insturment. the alert will be disabled
-#             if said instrument is marked "down"
+# instruments:  associated insturments. the alert will be disabled
+#              if any of these instruments is marked "down"
+#              this is primarily to allow for boss
 # heartbeat: use this keyword as a heartbeat (for specified actor)
 # dangerVal: a list of values to raise an alert for, or a single
 #            value if using above/below checker
@@ -27,36 +28,36 @@ apogee.ln2Level:
   checkAfter: 120
   emailAddresses: ['j.donor@tcu.edu']
   selfClear: True
-  instrument: apogee
-  # the {} is needed it seems. its empty to tell it to pass nothing to __init__
+  instruments: [apogee]
+  # the {} is needed it seems.
   checker: !!python/object/new:alertsActor.rules.dangerKey.heartbeatCheck {}
 apogee.tempAlarms: 
   cast: !!python/name:__builtin__.int
   # cast: !!python/object:alertsActor.rules.specialCasts.listElem
   #   {cast: !!python/name:__builtin__.int }
   severity: critical
-  instrument: apogee
+  instruments: [apogee]
   checker: !!python/object/new:alertsActor.rules.dangerKey.inList {}
 apogee.vacuumAlarm: 
   cast: !!python/name:__builtin__.int
   dangerVal: 1
   severity: critical
-  instrument: apogee
+  instruments: [apogee]
 apogee.ln2Alarm: 
   cast: !!python/name:__builtin__.int
   dangerVal: 1
   severity: critical
-  instrument: apogee
+  instruments: [apogee]
 apogee.collIndexer: 
   cast: !!python/name:__builtin__.str
   dangerVal: Off
   severity: serious
-  instrument: apogee
+  instruments: [apogee]
 apogee.ditherIndexer: 
   cast: !!python/name:__builtin__.str
   dangerVal: Off
   severity: serious
-  instrument: apogee
+  instruments: [apogee]
 
 # #######################################
 # apogeeql
@@ -66,19 +67,23 @@ apogeeql.rootURL:
   severity: warn
   heartbeat: apogeeql
   checkAfter: 75
+  emailAddresses: ['j.donor@tcu.edu']
   selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
 apogeeql.icsDiskAlarm:
   cast: !!python/name:__builtin__.str
   severity: warn
+  emailAddresses: ['j.donor@tcu.edu']
   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 apogeeql.qlDiskAlarm:
   cast: !!python/name:__builtin__.str
   severity: warn
+  emailAddresses: ['j.donor@tcu.edu']
   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 apogeeql.archDiskAlarm:
   cast: !!python/name:__builtin__.str
   severity: warn
+  emailAddresses: ['j.donor@tcu.edu']
   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 
 # #######################################
@@ -88,31 +93,37 @@ mcp.ab_status:
   cast: !!python/object:alertsActor.rules.specialCasts.firstElem
     {cast: !!python/name:__builtin__.int }
   severity: serious
+  emailAddresses: ['j.donor@tcu.edu']
   dangerVal: 0
   checker: !!python/object:alertsActor.rules.dangerKey.neq {}
+  instruments: [mcp]
 mcp.needIack:
   cast: !!python/name:__builtin__.int
   severity: warn
   dangerVal: 0
   checker: !!python/object:alertsActor.rules.dangerKey.neq {}
-mcp.userId:
-  cast: !!python/name:__builtin__.str
-  severity: info
-  dangerVal: jeg
+  instruments: [mcp]
+# mcp.userId:
+#   cast: !!python/name:__builtin__.str
+#   severity: info
+#   dangerVal: jeg
 mcp.aliveAt:
   cast: !!python/name:__builtin__.str
-  severity: warn
+  severity: serious
+  emailAddresses: ['j.donor@tcu.edu']
   heartbeat: mcp
   checkAfter: 75
   selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
+  instruments: [mcp]
 
 # #######################################
 # tcc
 # #######################################
 tcc.TCCPos:
   cast: !!python/name:__builtin__.str
-  severity: warn
+  severity: serious
+  emailAddresses: ['j.donor@tcu.edu']
   heartbeat: tcc
   checkAfter: 120
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
@@ -123,11 +134,13 @@ tcc.TCCPos:
 # #######################################
 boss.aliveAt:
   cast: !!python/name:__builtin__.int
-  severity: warn
+  severity: serious
+  emailAddresses: ['j.donor@tcu.edu']
   heartbeat: boss
   checkAfter: 75
   selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
+  instruments: [boss]
 boss.camCheck:
   cast: !!python/name:__builtin__.str  # possibly tuple!
   severity: warn

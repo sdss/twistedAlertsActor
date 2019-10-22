@@ -55,11 +55,23 @@ class camCheck(YAMLObject):
 
     def generateCamCheckAlert(self, key, severity):
         key = "camCheck." + key
+        instruments = ["boss"]
+        inst = key[:3]
+        side = key[3]
+
+        # most keywords will be SP[12][RB]
+        # check if they are and assign appropriate instruments
+        if inst in ["SP1", "SP2"]:
+            instruments.append("boss.{}".format(inst))
+            if side in ["R", "B"]:
+                instruments.append("boss.{}.{}".format(inst, side))
+
         if key not in self.alertsActor.monitoring:
             dumbCheck = doNothing()
             self.alertsActor.addKey(key, severity=severity, checkAfter=120,
                                     selfClear=False, checker=dumbCheck,
-                                    keyword="'Reported by camCheck'")
+                                    keyword="'Reported by camCheck'",
+                                    instruments=instruments)
         self.alertsActor.monitoring[key].setActive(severity)
 
     def __call__(self, keyState):
