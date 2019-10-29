@@ -66,10 +66,15 @@ class camCheck(YAMLObject):
             if side in ["R", "B"]:
                 instruments.append("boss.{}.{}".format(inst, side))
 
+        if severity in ["critical", "serious"]:
+            selfClear = False
+        else:
+            selfClear = True
+
         if key not in self.alertsActor.monitoring:
             dumbCheck = doNothing()
             self.alertsActor.addKey(key, severity=severity, checkAfter=120,
-                                    selfClear=False, checker=dumbCheck,
+                                    selfClear=selfClear, checker=dumbCheck,
                                     keyword="'Reported by camCheck'",
                                     instruments=instruments)
         self.alertsActor.monitoring[key].setActive(severity)
@@ -78,7 +83,17 @@ class camCheck(YAMLObject):
         keyval = keyState.keyword
         if self.alertsActor is None:
             self.alertsActor = keyState.alertsActorReference
+            # do this only once hopefully
+            for i in ["boss.SP1", "boss.SP2", "boss.SP1.R", "boss.SP2.R",
+                      "boss.SP1.B", "boss.SP2.B"]:
+                self.alertsActor.instrumentDown[i] = False
+        # print("CAMCHECK, len {}, type {}, key: {}".format(len(keyval), type(keyval), keyval))
 
+        if type(keyval) == str:
+            # could possibly try to fix this in hubModel casts, but easier here
+            keyval = [keyval]
+        if len(keyval) == 1 and keyval[0] == "None": # this is a bug somewhere upstream
+            keyval = []
         for k in keyval:
             if re.search(r"SP[12][RB][0-3]?CCDTemp", k):
                 self.generateCamCheckAlert(k, "critical")

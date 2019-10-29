@@ -255,7 +255,11 @@ class keyState(object):
 
 
     def keywordFmt(self):
-        instring = 'at {time} found {keyword}'.format(keyword=parseKey(self.keyword), time=self.triggeredTime)
+        if "heartbeat" in self.actorKey:
+            instring = "at {time}; last seen {diff} sec ago".format(time=self.triggeredTime,
+                                                                    diff=int(time.time()-self.lastalive))
+        else:
+            instring = 'at {time} found {keyword}'.format(keyword=parseKey(self.keyword), time=self.triggeredTime)
         return qstr(instring)
 
     @property
@@ -381,6 +385,8 @@ class keyState(object):
         if check == "ok":
             if self.selfClear:
                 self.clear()
+            # elif self.acknowledged:
+            #     self.clear()
             else:
                 self.severity = "ok"
         else:

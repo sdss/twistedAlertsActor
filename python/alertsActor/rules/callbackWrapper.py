@@ -44,8 +44,9 @@ class wrapCallbacks(object):
                 callback = self.updateKey(key)
                 self.datamodel_callbacks[key] = callback
 
-            if "instrument" in actions.keys():
-                alertsActor.instrumentUp[actions["instrument"]] = True
+            if "instruments" in actions.keys():
+                for i in actions["instruments"]:
+                    alertsActor.instrumentDown[i] = False
 
 
     def pulse(self, alertKey='NOT_SPECIFIED', checkAfter=30):

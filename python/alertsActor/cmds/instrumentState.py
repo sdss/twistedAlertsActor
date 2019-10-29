@@ -24,12 +24,12 @@ def instrumentState(actor, cmd, user, instrument=None, state="up"):
     """set the state of an instrument"""
 
     if state == "down":
-        actor.instrumentUp[instrument] = False
+        actor.instrumentDown[instrument] = True
         for a in actor.activeAlerts:
             if a.instrument == instrument:
                 a.disable(user)
     else:
-        actor.instrumentUp[instrument] = True
+        actor.instrumentDown[instrument] = False
         for a in actor.disabledAlerts:
             if a.instrument == instrument:
                 a.enable()

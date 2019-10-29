@@ -21,11 +21,11 @@
 # #######################################
 # apogee
 # #######################################
-apogee.ln2Level: 
+apogee.ditherPosition: 
   cast: !!python/name:__builtin__.str
   severity: warn
   heartbeat: apogee
-  checkAfter: 120
+  checkAfter: 599
   emailAddresses: ['j.donor@tcu.edu']
   selfClear: True
   instruments: [apogee]
@@ -66,7 +66,7 @@ apogeeql.rootURL:
   cast: !!python/name:__builtin__.str
   severity: warn
   heartbeat: apogeeql
-  checkAfter: 75
+  checkAfter: 599
   emailAddresses: ['j.donor@tcu.edu']
   selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
