@@ -76,12 +76,13 @@ class camCheck(YAMLObject):
             self.alertsActor.addKey(key, severity=severity, checkAfter=120,
                                     selfClear=selfClear, checker=dumbCheck,
                                     keyword="'Reported by camCheck'",
-                                    instruments=instruments)
+                                    instruments=instruments, emailAddresses=self.emailAddresses)
         self.alertsActor.monitoring[key].setActive(severity)
 
     def __call__(self, keyState):
         keyval = keyState.keyword
         if self.alertsActor is None:
+            print("setting alertsActor for camCheck!!")
             self.alertsActor = keyState.alertsActorReference
             # do this only once hopefully
             for i in ["boss.SP1", "boss.SP2", "boss.SP1.R", "boss.SP2.R",

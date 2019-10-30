@@ -144,4 +144,5 @@ boss.aliveAt:
 boss.camCheck:
   cast: !!python/name:__builtin__.str  # possibly tuple!
   severity: warn
-  checker: !!python/object:alertsActor.rules.dangerKey.camCheck {alertsActor: null, triggered: []}
+  checker: !!python/object:alertsActor.rules.dangerKey.camCheck 
+    {alertsActor: null, triggered: [], emailAddresses: ['j.donor@tcu.edu']}

@@ -225,7 +225,7 @@ class keyState(object):
     '''Keep track of the state of each actor.key'''
 
     def __init__(self, alertsActor, actorKey='oop.forgot', keyword="",
-                 emailAddresses=['fail@fail.com'], **kwargs):
+                 emailAddresses=['j.donor@tcu.edu'], **kwargs):
         self.alertsActorReference = alertsActor
         self.triggeredTime = None
         self.actorKey = actorKey
@@ -240,6 +240,7 @@ class keyState(object):
         self.acknowledger = -1
         self.checkMe = Timer()
         self.emailAddresses = emailAddresses
+        self.emailSent = False
         # self.smtpclient = "localhost:1025"
         self.smtpclient = alertsActor.config["email"]["mailClient"]
 
@@ -308,6 +309,7 @@ class keyState(object):
         self.checkMe = Timer()
         self.severity = 'ok'
         self.triggeredTime = None
+        self.emailSent = False
 
         self.alertsActorReference.broadcastActive()
         self.alertsActorReference.broadcastDisabled()
@@ -357,9 +359,14 @@ class keyState(object):
 
     def sendEmail(self):
         # notify over email
+        if self.emailSent:
+            # I don't think this should happen but it seems to...
+            log.info("Tried to send extra email for {}".format(self.actorKey))
+            return
         mail.sendEmail(self, self.smtpclient)
         # and sms?
         # sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
+        self.emailSent = True
 
 
     def dispatchAlertMessage(self):
