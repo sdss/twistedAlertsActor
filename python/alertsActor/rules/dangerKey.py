@@ -71,13 +71,17 @@ class camCheck(YAMLObject):
         else:
             selfClear = True
 
+        if key not in self.triggered:
+            self.triggered.append(key)
+
         if key not in self.alertsActor.monitoring:
             dumbCheck = doNothing()
             self.alertsActor.addKey(key, severity=severity, checkAfter=120,
                                     selfClear=selfClear, checker=dumbCheck,
                                     keyword="'Reported by camCheck'",
                                     instruments=instruments, emailAddresses=self.emailAddresses)
-        self.alertsActor.monitoring[key].setActive(severity)
+        if not self.alertsActor.monitoring[key].active:
+            self.alertsActor.monitoring[key].setActive(severity)
 
     def __call__(self, keyState):
         keyval = keyState.keyword
@@ -113,10 +117,11 @@ class camCheck(YAMLObject):
 
         for k in self.triggered:
             if k.split(".")[-1] not in keyval:  # b/c we know its camCheck already
-                self.alertsActor.monitoring[key].severity = "ok"
+                self.alertsActor.monitoring[k].severity = "ok"
                 # now it can check itself and find out its cool
                 # and then decide to disappear if its acknowledged, etc etc
-                self.alertsActor.monitoring[key].checkKey()
+                self.alertsActor.monitoring[k].checkKey()
+                self.triggered.remove(k)
 
         # never flag camCheck, always monitored keys
         return "ok"
