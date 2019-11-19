@@ -68,16 +68,21 @@ class camCheck(YAMLObject):
 
         if severity in ["critical", "serious"]:
             selfClear = False
+            addresses = self.emailAddresses
         else:
             selfClear = True
+            addresses = None
 
         if key not in self.alertsActor.monitoring:
             dumbCheck = doNothing()
             self.alertsActor.addKey(key, severity=severity, checkAfter=120,
                                     selfClear=selfClear, checker=dumbCheck,
                                     keyword="'Reported by camCheck'",
-                                    instruments=instruments, emailAddresses=self.emailAddresses)
-        self.alertsActor.monitoring[key].setActive(severity)
+                                    instruments=instruments, emailAddresses=addresses)
+        if self.alertsActor.monitoring[key].active:
+            self.alertsActor.monitoring[key].stampTime()
+        else:
+            self.alertsActor.monitoring[key].setActive(severity)
 
     def __call__(self, keyState):
         keyval = keyState.keyword
@@ -117,6 +122,8 @@ class camCheck(YAMLObject):
                 # now it can check itself and find out its cool
                 # and then decide to disappear if its acknowledged, etc etc
                 self.alertsActor.monitoring[key].checkKey()
+            else:
+                log.warn(k.split(".")[-1] + " still reported by camCheck!")
 
         # never flag camCheck, always monitored keys
         return "ok"

@@ -225,7 +225,7 @@ class keyState(object):
     '''Keep track of the state of each actor.key'''
 
     def __init__(self, alertsActor, actorKey='oop.forgot', keyword="",
-                 emailAddresses=['j.donor@tcu.edu'], **kwargs):
+                 emailAddresses=None, **kwargs):
         self.alertsActorReference = alertsActor
         self.triggeredTime = None
         self.actorKey = actorKey
@@ -283,6 +283,9 @@ class keyState(object):
             return False
 
 
+    def stampTime(self):
+        self.triggeredTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
     def setActive(self, severity=None):
         # something cause a problem, do stuff
         self.acknowledged = False # clear anything from old alert
@@ -291,7 +294,7 @@ class keyState(object):
             self.severity = self.defaultSeverity
         else:
             self.severity = severity
-        self.triggeredTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        self.stampTime()
         self.checkMe.start(self.checkAfter, self.reevaluate)
 
         if self.instDown:
@@ -359,10 +362,14 @@ class keyState(object):
 
     def sendEmail(self):
         # notify over email
+        if self.emailAddresses is None:
+            return
+
         if self.emailSent:
             # I don't think this should happen but it seems to...
             log.info("Tried to send extra email for {}".format(self.actorKey))
             return
+
         mail.sendEmail(self, self.smtpclient)
         # and sms?
         # sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
