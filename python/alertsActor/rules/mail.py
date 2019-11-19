@@ -3,6 +3,8 @@ import time
 import smtplib
 from email.mime.text import MIMEText
 
+from alertsActor import log
+
 def sendEmail(keyState, mailClient):
     """Send an email. 
 
@@ -38,6 +40,6 @@ def sendEmail(keyState, mailClient):
         # Send the email - real from, real to, extra headers and content ...
         s.sendmail(sender, recipients, msg.as_string())
     except Exception, e:
-        logging.warn("Sending email warning: %s %s" % (msg, e))
+        log.warn("Sending email warning: %s %s" % (msg, e))
     finally:
         s.close()

@@ -399,8 +399,8 @@ class keyState(object):
         if check == "ok":
             if self.selfClear:
                 self.clear()
-            # elif self.acknowledged:
-            #     self.clear()
+            elif self.acknowledged:
+                self.clear()
             else:
                 self.severity = "ok"
         else:
