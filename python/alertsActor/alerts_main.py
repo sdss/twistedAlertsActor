@@ -402,7 +402,8 @@ class keyState(object):
             elif self.acknowledged:
                 self.clear()
             else:
-                self.severity = "ok"
+                # self.severity = "ok"
+                return self.severity
         else:
             if not self.active:
                 self.setActive(check)
