@@ -90,13 +90,12 @@ apogeeql.archDiskAlarm:
 # mcp
 # #######################################
 mcp.ab_status:
-  cast: !!python/object:alertsActor.rules.specialCasts.firstElem
-    {cast: !!python/name:__builtin__.int }
+  cast: !!python/name:__builtin__.int
   severity: serious
   emailAddresses: ['j.donor@tcu.edu']
-  dangerVal: 0
-  checker: !!python/object:alertsActor.rules.dangerKey.neq {}
-  instruments: [mcp]
+  dangerVal: 1
+  checker: !!python/object:alertsActor.rules.dangerKey.firstElem {}
+  instrument: [mcp]
 mcp.needIack:
   cast: !!python/name:__builtin__.int
   severity: warn
