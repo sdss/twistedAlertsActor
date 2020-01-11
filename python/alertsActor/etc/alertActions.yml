@@ -112,7 +112,7 @@ mcp.aliveAt:
   severity: serious
   emailAddresses: ['j.donor@tcu.edu']
   heartbeat: mcp
-  checkAfter: 75
+  checkAfter: 120 
   selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
   instruments: [mcp]
@@ -137,7 +137,7 @@ boss.aliveAt:
   severity: serious
   emailAddresses: ['j.donor@tcu.edu']
   heartbeat: boss
-  checkAfter: 75
+  checkAfter: 120
   selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
   instruments: [boss]
