@@ -197,6 +197,18 @@ class inList(YAMLObject):
         else:
             return "ok"
 
+class firstElem(YAMLObject):
+    """is any value in the list "True", e.g. flagged
+    """
+    def __init__(self):
+        pass
+
+    def __call__(self, keyState):
+        if keyState.keyword[0] == keyState.dangerVal:
+            return keyState.defaultSeverity
+        else:
+            return "ok"
+
 class default(object):
     """check equality to a dangerval
     """
