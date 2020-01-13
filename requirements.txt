@@ -5,4 +5,3 @@ opscore
 RO
 twilio
 click<=6.7
-pathlib2>=2.3.4
