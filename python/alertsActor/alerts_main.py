@@ -284,7 +284,7 @@ class keyState(object):
 
 
     def stampTime(self):
-        self.triggeredTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        self.triggeredTime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
 
     def setActive(self, severity=None):
         # something cause a problem, do stuff
