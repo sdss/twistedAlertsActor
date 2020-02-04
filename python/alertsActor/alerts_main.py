@@ -337,6 +337,8 @@ class keyState(object):
     def reevaluate(self):
         # at some point this will presumably raise alert level?
         # possibly send email? Or only send email for critical? Or...
+        hub_connection = self.alertsActorReference.hub.device.state
+        print("hub connection is: {}".format(hub_connection))
         check = self.checkKey()
         print("evaluated {} found {} default {}".format(self.actorKey, check, self.defaultSeverity))
         if check != self.severity:

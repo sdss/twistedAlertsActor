@@ -54,10 +54,10 @@ class camCheck(YAMLObject):
 
 
     def generateCamCheckAlert(self, key, severity):
-        key = "camCheck." + key
-        instruments = ["boss"]
         inst = key[:3]
         side = key[3]
+        key = "camCheck." + key
+        instruments = ["boss"]
 
         # most keywords will be SP[12][RB]
         # check if they are and assign appropriate instruments

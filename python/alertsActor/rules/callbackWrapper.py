@@ -72,11 +72,11 @@ class wrapCallbacks(object):
 
     def updateKey(self, actorKey):
         def check(newKeyval):
-            print("---------------------------")
-            print(newKeyval)
+            # print("---------------------------")
+            # print(newKeyval)
             if len(newKeyval) == 1:
                 newKeyval = newKeyval[0]
-            print("{} {} {}".format(actorKey, newKeyval, type(newKeyval)))
+            # print("{} {} {}".format(actorKey, newKeyval, type(newKeyval)))
             # called as callback, so the updated key is passed by default
             self.alertsActor.monitoring[actorKey].keyword = newKeyval
             self.alertsActor.monitoring[actorKey].checkKey()
