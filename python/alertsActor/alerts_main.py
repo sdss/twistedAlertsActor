@@ -116,16 +116,26 @@ class alertsActor(BaseActor):
         self.writeToUsers("i", 'instrumentNames={}'.format(",".join(instruments)))
         self.writeToUsers("i", 'downInstruments={}'.format(",".join(down)))
 
+    
+    def reconnect(self):
+        # convenience method to call occassionally
+        # should be able to recover from a hub disconnect
+        if self.hub is None:
+            print("no hub connection, reconnecting!")
+            self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts,
+                                         datamodel_callbacks=self.callbacks.datamodel_callbacks)
+        elif self.hub.didFail:
+            print("no hub connection, reconnecting!")
+            self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts,
+                                         datamodel_callbacks=self.callbacks.datamodel_callbacks)
+
     @property
     def hubModel(self):
         # keeps a running data model of keywords coming from the hub
         # allows callbacks on updates
 
         # this may need to be more careful... test!
-        if self.hub is None:
-            print("no hub connection, reconnecting!")
-            self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts,
-                                         datamodel_callbacks=self.callbacks.datamodel_callbacks)
+        self.reconnect()
 
         return self.hub.datamodel
 
@@ -134,7 +144,7 @@ class alertsActor(BaseActor):
         """Dispatch the user command. Stolen from BMO."""
 
         def test_cmd(args):
-            print("t ", args)
+            # print("t ", args)
             result = CliRunner().invoke(alerts_parser, args)
             if result.exit_code > 0:
                 # If code > 0, there was an error. We fail the command and inform the users.
@@ -337,8 +347,8 @@ class keyState(object):
     def reevaluate(self):
         # at some point this will presumably raise alert level?
         # possibly send email? Or only send email for critical? Or...
-        hub_connection = self.alertsActorReference.hub.device.state
-        print("hub connection is: {}".format(hub_connection))
+        if self.alertsActorReference.hub.didFail:
+            self.alertsActorReference.reconnect()
         check = self.checkKey()
         print("evaluated {} found {} default {}".format(self.actorKey, check, self.defaultSeverity))
         if check != self.severity:
