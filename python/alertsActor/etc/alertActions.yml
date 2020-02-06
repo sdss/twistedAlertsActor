@@ -23,67 +23,79 @@
 # #######################################
 apogee.ditherPosition: 
   cast: !!python/name:__builtin__.str
-  severity: warn
+  severity: critical
   heartbeat: apogee
   checkAfter: 599
-  emailAddresses: ['j.donor@tcu.edu']
+  # emailDelay: 120
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']
   selfClear: True
   instruments: [apogee]
-  # the {} is needed it seems.
+  # the {} is needed it seems. Used by constructor for object attributes?
   checker: !!python/object/new:alertsActor.rules.dangerKey.heartbeatCheck {}
 apogee.tempAlarms: 
   cast: !!python/name:__builtin__.int
-  # cast: !!python/object:alertsActor.rules.specialCasts.listElem
-  #   {cast: !!python/name:__builtin__.int }
   severity: critical
   instruments: [apogee]
+  emailDelay: 60
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']
   checker: !!python/object/new:alertsActor.rules.dangerKey.inList {}
 apogee.vacuumAlarm: 
   cast: !!python/name:__builtin__.int
   dangerVal: 1
   severity: critical
   instruments: [apogee]
+  emailDelay: 60
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']
 apogee.ln2Alarm: 
   cast: !!python/name:__builtin__.int
   dangerVal: 1
   severity: critical
   instruments: [apogee]
+  emailDelay: 60
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']
 apogee.collIndexer: 
   cast: !!python/name:__builtin__.str
   dangerVal: Off
   severity: serious
   instruments: [apogee]
+  emailDelay: 60
+  emailAddresses: ['j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu',]
 apogee.ditherIndexer: 
   cast: !!python/name:__builtin__.str
   dangerVal: Off
   severity: serious
   instruments: [apogee]
+  emailDelay: 60
+  emailAddresses: ['j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu',]
 
 # #######################################
 # apogeeql
 # #######################################
 apogeeql.rootURL:
   cast: !!python/name:__builtin__.str
-  severity: warn
+  severity: critical
   heartbeat: apogeeql
   checkAfter: 599
-  emailAddresses: ['j.donor@tcu.edu']
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']
   selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
 apogeeql.icsDiskAlarm:
   cast: !!python/name:__builtin__.str
   severity: warn
-  emailAddresses: ['j.donor@tcu.edu']
+  emailAddresses: ['holtz@nmsu.edu', 'frh3z@virginia.edu', 'srm4n@virginia.edu', 'nathan.delee@vanderbilt.edu']
+  emailDelay: 0
   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 apogeeql.qlDiskAlarm:
   cast: !!python/name:__builtin__.str
   severity: warn
-  emailAddresses: ['j.donor@tcu.edu']
+  emailAddresses: ['holtz@nmsu.edu', 'frh3z@virginia.edu', 'srm4n@virginia.edu', 'nathan.delee@vanderbilt.edu']
+  emailDelay: 0
   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 apogeeql.archDiskAlarm:
   cast: !!python/name:__builtin__.str
   severity: warn
-  emailAddresses: ['j.donor@tcu.edu']
+  emailAddresses: ['holtz@nmsu.edu', 'frh3z@virginia.edu', 'srm4n@virginia.edu', 'nathan.delee@vanderbilt.edu']
+  emailDelay: 0
   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 
 # #######################################
@@ -92,7 +104,7 @@ apogeeql.archDiskAlarm:
 mcp.ab_status:
   cast: !!python/name:__builtin__.int
   severity: serious
-  emailAddresses: ['j.donor@tcu.edu']
+  emailAddresses: ['j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu']
   dangerVal: 1
   checker: !!python/object:alertsActor.rules.dangerKey.firstElem {}
   instrument: [mcp]
@@ -111,7 +123,8 @@ mcp.needIack:
 mcp.aliveAt:
   cast: !!python/name:__builtin__.str
   severity: serious
-  emailAddresses: ['j.donor@tcu.edu']
+  # emailDelay: uses checkAfter by default
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']
   heartbeat: mcp
   checkAfter: 120 
   selfClear: True
@@ -123,8 +136,9 @@ mcp.aliveAt:
 # #######################################
 tcc.TCCPos:
   cast: !!python/name:__builtin__.str
-  severity: serious
-  emailAddresses: ['j.donor@tcu.edu']
+  severity: critical
+  # emailDelay: uses checkAfter by default
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']
   heartbeat: tcc
   checkAfter: 120
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
@@ -135,8 +149,9 @@ tcc.TCCPos:
 # #######################################
 boss.aliveAt:
   cast: !!python/name:__builtin__.int
-  severity: serious
-  emailAddresses: ['j.donor@tcu.edu']
+  severity: critical
+  # emailDelay: uses checkAfter by default
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']
   heartbeat: boss
   checkAfter: 120
   selfClear: True
@@ -146,4 +161,4 @@ boss.camCheck:
   cast: !!python/name:__builtin__.str  # possibly tuple!
   severity: warn
   checker: !!python/object:alertsActor.rules.dangerKey.camCheck 
-    {alertsActor: null, triggered: [], emailAddresses: ['j.donor@tcu.edu']}
+    {alertsActor: null, triggered: [], emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']}

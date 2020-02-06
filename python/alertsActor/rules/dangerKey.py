@@ -81,7 +81,8 @@ class camCheck(YAMLObject):
             self.alertsActor.addKey(key, severity=severity, checkAfter=120,
                                     selfClear=selfClear, checker=dumbCheck,
                                     keyword="'Reported by camCheck'",
-                                    instruments=instruments, emailAddresses=addresses)
+                                    instruments=instruments, emailAddresses=addresses,
+                                    emailDelay=0)
         if self.alertsActor.monitoring[key].active:
             self.alertsActor.monitoring[key].stampTime()
         else:
@@ -141,9 +142,9 @@ class heartbeatCheck(YAMLObject):
         if time.time() - keyState.lastalive < keyState.checkAfter:
             return "ok"
         elif time.time() - keyState.lastalive > 5*keyState.checkAfter:
-            return "serious"
+            return "critical"
         else:
-            return "warn"
+            return keyState.defaultSeverity
 
 
 class above(YAMLObject):

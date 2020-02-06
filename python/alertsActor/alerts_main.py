@@ -249,6 +249,7 @@ class keyState(object):
         self.acknowledgeMsg = ""
         self.acknowledger = -1
         self.checkMe = Timer()
+        self.emailTimer = Timer()
         self.emailAddresses = emailAddresses
         self.emailSent = False
         # self.smtpclient = "localhost:1025"
@@ -261,6 +262,7 @@ class keyState(object):
         self.instruments = kwargs.get("instruments", None)
         self.checkAfter = kwargs.get("checkAfter", 120)
         self.checker = kwargs.get("checker", dangerKey.default())
+        self.emailDelay = kwargs.get("emailDelay", self.checkAfter)
 
         assert self.severity in ['ok', 'info', 'apogeediskwarn', 'warn', 'serious', 'critical'], "severity level not allowed"
 
@@ -313,13 +315,15 @@ class keyState(object):
             return None
 
         self.dispatchAlertMessage()
-        self.sendEmail()
+        # give the alert a chance to clear before emailing everyone
+        self.emailTimer.start(self.emailDelay, self.sendEmail)
 
 
     def clear(self):
         # everything good, back to normal
         self.active = False
         self.checkMe = Timer()
+        self.emailTimer = Timer()
         self.severity = 'ok'
         self.triggeredTime = None
         self.emailSent = False
