@@ -82,19 +82,19 @@ apogeeql.rootURL:
 apogeeql.icsDiskAlarm:
   cast: !!python/name:__builtin__.str
   severity: warn
-  emailAddresses: ['holtz@nmsu.edu', 'frh3z@virginia.edu', 'srm4n@virginia.edu', 'nathan.delee@vanderbilt.edu']
+  emailAddresses: ['holtz@nmsu.edu', 'jsobeck@uw.edu', 'srm4n@virginia.edu', 'nathan.delee@vanderbilt.edu']
   emailDelay: 0
   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 apogeeql.qlDiskAlarm:
   cast: !!python/name:__builtin__.str
   severity: warn
-  emailAddresses: ['holtz@nmsu.edu', 'frh3z@virginia.edu', 'srm4n@virginia.edu', 'nathan.delee@vanderbilt.edu']
+  emailAddresses: ['holtz@nmsu.edu', 'jsobeck@uw.edu', 'srm4n@virginia.edu', 'nathan.delee@vanderbilt.edu']
   emailDelay: 0
   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 apogeeql.archDiskAlarm:
   cast: !!python/name:__builtin__.str
   severity: warn
-  emailAddresses: ['holtz@nmsu.edu', 'frh3z@virginia.edu', 'srm4n@virginia.edu', 'nathan.delee@vanderbilt.edu']
+  emailAddresses: ['holtz@nmsu.edu', 'jsobeck@uw.edu', 'srm4n@virginia.edu', 'nathan.delee@vanderbilt.edu']
   emailDelay: 0
   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 
