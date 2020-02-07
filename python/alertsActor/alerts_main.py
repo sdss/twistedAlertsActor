@@ -12,6 +12,7 @@ from __future__ import absolute_import
 import json
 # import yaml
 import sys
+import os
 import traceback
 
 import time
@@ -56,7 +57,9 @@ class alertsActor(BaseActor):
         self.connectHub('localhost', datamodel_casts=self.callbacks.datamodel_casts,
                                      datamodel_callbacks=self.callbacks.datamodel_callbacks)
 
-        log.start_file_logger("~/alertsLog.txt")
+        logfile = os.path.join(self.config["logging"]["logdir"],
+                               time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime()))
+        log.start_file_logger(logfile + ".log")
 
         log.info('starting alertsActor actor version={!r} in port={}'
                  .format(__version__, kwargs['userPort']))

@@ -8,6 +8,8 @@
 import re, time
 from yaml import YAMLObject
 
+from alertsActor import log
+
 
 class diskCheck(YAMLObject):
     """evaluate a disk keyword

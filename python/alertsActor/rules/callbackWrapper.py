@@ -8,6 +8,7 @@
 import time
 from RO.Comm.TwistedTimer import Timer
 
+from alertsActor import log
 
 class wrapCallbacks(object):
     """Pass in keywords read from a file
