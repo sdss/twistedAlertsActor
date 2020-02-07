@@ -98,6 +98,7 @@ class camCheck(YAMLObject):
                       "boss.SP1.B", "boss.SP2.B"]:
                 self.alertsActor.instrumentDown[i] = False
         # print("CAMCHECK, len {}, type {}, key: {}".format(len(keyval), type(keyval), keyval))
+        log.info('CAMCHECK reported {}'.format(keyval))
 
         if type(keyval) == str:
             # could possibly try to fix this in hubModel casts, but easier here
