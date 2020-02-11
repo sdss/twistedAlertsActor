@@ -84,18 +84,21 @@ apogeeql.icsDiskAlarm:
   severity: warn
   emailAddresses: ['holtz@nmsu.edu', 'jsobeck@uw.edu', 'srm4n@virginia.edu', 'nathan.delee@vanderbilt.edu']
   emailDelay: 0
+  selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 apogeeql.qlDiskAlarm:
   cast: !!python/name:__builtin__.str
   severity: warn
   emailAddresses: ['holtz@nmsu.edu', 'jsobeck@uw.edu', 'srm4n@virginia.edu', 'nathan.delee@vanderbilt.edu']
   emailDelay: 0
+  selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 apogeeql.archDiskAlarm:
   cast: !!python/name:__builtin__.str
   severity: warn
   emailAddresses: ['holtz@nmsu.edu', 'jsobeck@uw.edu', 'srm4n@virginia.edu', 'nathan.delee@vanderbilt.edu']
   emailDelay: 0
+  selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.diskCheck {}
 
 # #######################################
@@ -108,14 +111,14 @@ mcp.ab_status:
   dangerVal: 1
   checker: !!python/object:alertsActor.rules.dangerKey.firstElem {}
   instrument: [mcp]
-mcp.needIack:
-  cast: !!python/name:__builtin__.str
-  # in a perfect world this would be a boolean cast but in the interest of 
-  # not writing yet another custom cast for boolean strings, this works
-  severity: warn
-  dangerVal: 'true'
-  checker: !!python/object:alertsActor.rules.dangerKey.neq {}
-  instruments: [mcp]
+# mcp.needIack:
+#   cast: !!python/name:__builtin__.str
+#   # in a perfect world this would be a boolean cast but in the interest of 
+#   # not writing yet another custom cast for boolean strings, this works
+#   severity: warn
+#   dangerVal: 'true'
+#   checker: !!python/object:alertsActor.rules.dangerKey.neq {}
+#   instruments: [mcp]
 # mcp.userId:
 #   cast: !!python/name:__builtin__.str
 #   severity: info
