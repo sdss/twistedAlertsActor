@@ -110,7 +110,7 @@ mcp.ab_status:
   emailAddresses: ['j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu']
   dangerVal: 1
   checker: !!python/object:alertsActor.rules.dangerKey.firstElem {}
-  instrument: [mcp]
+  instruments: [mcp]
 # mcp.needIack:
 #   cast: !!python/name:__builtin__.str
 #   # in a perfect world this would be a boolean cast but in the interest of 
