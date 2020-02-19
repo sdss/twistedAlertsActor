@@ -275,7 +275,7 @@ class keyState(object):
             instring = "at {time}; last seen {diff} sec ago".format(time=self.triggeredTime,
                                                                     diff=int(time.time()-self.lastalive))
         else:
-            instring = 'at {time} found {keyword}'.format(keyword=parseKey(self.keyword), time=self.triggeredTime)
+            instring = 'at {time} UT found {keyword}'.format(keyword=parseKey(self.keyword), time=self.triggeredTime)
         return qstr(instring)
 
     @property
