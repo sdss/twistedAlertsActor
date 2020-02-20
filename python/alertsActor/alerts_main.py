@@ -187,6 +187,7 @@ class alertsActor(BaseActor):
             # current tron config passes user, we aren't handling that yet
             if "." in args[0]:
                 user = args[0]
+                cmd.cmdID = int(args[1])
                 temp_args = args[2:]
             else:
                 user = "?.?"
@@ -195,6 +196,7 @@ class alertsActor(BaseActor):
             result = test_cmd(temp_args)
             if result is False:
                 return
+            # cmd.cmdBody = " ".join(temp_args)
             alerts_parser(temp_args, obj=dict(actor=self, cmd=cmd, user=user))
         except CommandError as ee:
             log.warning("command {} failed with {}".format(cmd.cmdStr, strFromException(ee)))
