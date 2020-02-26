@@ -63,9 +63,12 @@ class wrapCallbacks(object):
             # called as callback, so the updated key is passed by default
             # print('pulse: ', alertKey, newKeyval[0])
             log.info('{}: the actor said {}'.format(alertKey, newKeyval))
+            # don't remember why we want the first element of the list here
+            # but it shouldn't matter for heartbeat monitoring
             self.alertsActor.monitoring[alertKey].keyword = newKeyval[0]
             self.alertsActor.monitoring[alertKey].lastalive = time.time()
             self.alertsActor.heartbeats[alertKey].start(checkAfter, deadCallback)
+            self.alertsActor.monitoring[alertKey].checkKey()
 
         startTime(["init"])  # call now so it raises error?
 
