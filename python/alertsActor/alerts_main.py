@@ -327,7 +327,9 @@ class keyState(object):
     def clear(self):
         # everything good, back to normal
         self.active = False
+        self.checkMe.cancel()
         self.checkMe = Timer()
+        self.emailTimer.cancel()
         self.emailTimer = Timer()
         self.severity = 'ok'
         self.triggeredTime = None
@@ -389,6 +391,10 @@ class keyState(object):
         if self.emailSent:
             # I don't think this should happen but it seems to...
             log.info("Tried to send extra email for {}".format(self.actorKey))
+            return
+
+        if not self.active:
+            log.warn("Tried to send email after clear for {}".format(self.actorKey))
             return
 
         mail.sendEmail(self, self.smtpclient)
