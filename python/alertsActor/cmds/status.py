@@ -37,12 +37,14 @@ def status(actor, cmd, user):
 
     dontClutterSDSSUser = os.getlogin()
     if "sdss" in dontClutterSDSSUser:
-        return False
+        with open("/data/logs/actors/alerts/alerts.hubModel.yaml", "w") as dump:
+            print(yaml.dump(actor.hubModel), file=dump)
 
     # otherwise we can clutter the home directory a bit
     # write a log of the hubModel for posterity
-    with open("alerts.hubModel.yaml", "w") as dump:
-        print(yaml.dump(actor.hubModel), file=dump)
+    else:
+        with open("alerts.hubModel.yaml", "w") as dump:
+            print(yaml.dump(actor.hubModel), file=dump)
 
 
     return False
