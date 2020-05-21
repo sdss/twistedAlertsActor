@@ -255,6 +255,8 @@ class keyState(object):
         self.acknowledger = -1
         self.checkMe = Timer()
         self.emailTimer = Timer()
+        self.delayActiveTimer = Timer()
+        self.delayedAlready = False
         self.emailAddresses = emailAddresses
         self.emailSent = False
         # self.smtpclient = "localhost:1025"
@@ -268,6 +270,7 @@ class keyState(object):
         self.checkAfter = kwargs.get("checkAfter", 120)
         self.checker = kwargs.get("checker", dangerKey.default())
         self.emailDelay = kwargs.get("emailDelay", self.checkAfter)
+        self.delayActive = kwargs.get("delayActive", 0)
 
         assert self.severity in ['ok', 'info', 'apogeediskwarn', 'warn', 'serious', 'critical'], "severity level not allowed"
 
@@ -334,6 +337,7 @@ class keyState(object):
         self.severity = 'ok'
         self.triggeredTime = None
         self.emailSent = False
+        self.delayedAlready = False
 
         self.alertsActorReference.broadcastActive()
         self.alertsActorReference.broadcastDisabled()
@@ -431,9 +435,16 @@ class keyState(object):
             else:
                 # self.severity = "ok"
                 return self.severity
-        else:
-            if not self.active:
+        elif not self.active:
+            if self.delayActive == 0:
                 self.setActive(check)
+            elif self.delayActiveTimer.isActive:
+                return "ok"
+            elif self.delayedAlready:
+                self.setActive(check)
+            else:
+                self.delayedAlready = True
+                self.delayActiveTimer.start(self.delayActive, self.checkKey(self))
 
         return check
 

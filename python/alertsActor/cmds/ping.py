@@ -23,8 +23,8 @@ __all__ = ('ping')
 def ping(actor, cmd, user):
     """Pings the actor."""
 
-    # for k, a in actor.monitoring.items():
-    #     print(k, a.keyword)
+    for k, a in actor.monitoring.items():
+        print(k, a.keyword)
 
     cmd.setState(cmd.Done, "I'm not dead yet!")
     # print("monitoring heartbeats for :", actor.heartbeats.keys())
