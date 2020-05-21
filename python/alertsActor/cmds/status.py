@@ -8,6 +8,9 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+import os
+import yaml
+
 import click
 
 from alertsActor.cmds import alerts_context
@@ -31,5 +34,15 @@ def status(actor, cmd, user):
     actor.broadcastInstruments()
 
     cmd.setState(cmd.Done, "Now you know all I know")
+
+    dontClutterSDSSUser = os.getlogin()
+    if "sdss" in dontClutterSDSSUser:
+        return False
+
+    # otherwise we can clutter the home directory a bit
+    # write a log of the hubModel for posterity
+    with open("alerts.hubModel.yaml", "w") as dump:
+        print(yaml.dump(actor.hubModel), file=dump)
+
 
     return False
