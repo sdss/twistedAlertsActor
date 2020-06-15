@@ -75,7 +75,7 @@ apogeeql.rootURL:
   cast: !!python/name:__builtin__.str
   severity: critical
   heartbeat: apogeeql
-  checkAfter: 599
+  checkAfter: 180
   emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']
   selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
