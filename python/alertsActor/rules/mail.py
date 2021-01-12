@@ -1,12 +1,13 @@
-import time 
+import time
 
 import smtplib
 from email.mime.text import MIMEText
 
 from alertsActor import log
 
+
 def sendEmail(keyState, mailClient):
-    """Send an email. 
+    """Send an email.
 
     Input:
     -keyState: keyState object from alerts_main
@@ -39,6 +40,7 @@ def sendEmail(keyState, mailClient):
         s.connect(mailClient)
         # Send the email - real from, real to, extra headers and content ...
         s.sendmail(sender, recipients, msg.as_string())
+        log.info("Sent email for %s %s" % (keyState.severity, keyState.actorKey))
     except Exception, e:
         log.warn("Sending email warning: %s %s" % (msg, e))
     finally:
