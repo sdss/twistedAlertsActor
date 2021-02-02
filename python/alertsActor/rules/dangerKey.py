@@ -24,11 +24,11 @@ class diskCheck(YAMLObject):
         keyval = keyState.keyword
         if (keyval[0]).upper() == 'OK':
             return "ok"
-        elif  (keyval[0]).upper() == 'WARNING':
+        elif (keyval[0]).upper() == 'WARNING':
             return "warn"
-        elif  (keyval[0]).upper() == 'SERIOUS':
+        elif (keyval[0]).upper() == 'SERIOUS':
             return "serious"
-        elif  (keyval[0]).upper() == 'CRITICAL':
+        elif (keyval[0]).upper() == 'CRITICAL':
             return "critical"
         else:
             return "info"
@@ -41,7 +41,6 @@ class doNothing(object):
     """
     def __init__(self):
         pass
-
 
     def __call__(self, keyState):
         return keyState.severity
@@ -136,7 +135,7 @@ class camCheck(YAMLObject):
 
 
 class heartbeatCheck(YAMLObject):
-    """check a heartbeat. 
+    """check a heartbeat.
     """
     def __init__(self):
         pass

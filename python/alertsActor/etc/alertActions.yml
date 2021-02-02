@@ -55,18 +55,27 @@ apogee.ln2Alarm:
   emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']
 apogee.collIndexer: 
   cast: !!python/name:__builtin__.str
-  dangerVal: Off
+  dangerVal: "Off"
   severity: serious
   instruments: [apogee]
   emailDelay: 60
   emailAddresses: ['j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu',]
 apogee.ditherIndexer: 
   cast: !!python/name:__builtin__.str
-  dangerVal: Off
+  dangerVal: "Off"
   severity: serious
   instruments: [apogee]
   emailDelay: 60
   emailAddresses: ['j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu',]
+
+apogee.arrayPower: 
+  cast: !!python/name:__builtin__.str
+  dangerVal: "on"
+  severity: serious
+  instruments: [apogee]
+  emailDelay: 60
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu','kpan@apo.nmsu.edu']
+  checker: !!python/object/new:alertsActor.rules.dangerKey.neq {}
 
 # #######################################
 # apogeeql
@@ -127,8 +136,8 @@ mcp.aliveAt:
   cast: !!python/name:__builtin__.str
   severity: serious
   # emailDelay: uses checkAfter by default
-  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']
   heartbeat: mcp
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'jsobeck@uw.edu', 'kpan@apo.nmsu.edu']
   checkAfter: 120 
   selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
