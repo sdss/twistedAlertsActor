@@ -28,7 +28,7 @@ from alertsActor import __version__, alertActions
 from alertsActor.cmds.cmd_parser import alerts_parser
 from alertsActor import log
 
-from alertsActor.rules import callbackWrapper, mail, sms, dangerKey
+from alertsActor.rules import callbackWrapper, mail, dangerKey  # sms
 
 
 class alertsActor(BaseActor):

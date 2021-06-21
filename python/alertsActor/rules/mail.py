@@ -41,7 +41,7 @@ def sendEmail(keyState, mailClient):
         # Send the email - real from, real to, extra headers and content ...
         s.sendmail(sender, recipients, msg.as_string())
         log.info("Sent email for %s %s" % (keyState.severity, keyState.actorKey))
-    except Exception, e:
+    except Exception as e:
         log.warn("Sending email warning: %s %s" % (msg, e))
     finally:
         s.close()
