@@ -185,19 +185,22 @@ class alertsActor(BaseActor):
             args = [a.lower() if not "=" in a else a for a in cmd.cmdBody.split()]
             args = [a.split("=")[-1] for a in args]
             # current tron config passes user, we aren't handling that yet
-            if "." in args[0]:
-                user = args[0]
-                cmd.cmdID = int(args[1])
-                temp_args = args[2:]
-            else:
-                user = "?.?"
-                temp_args = args
-            log.info('{} issued {}'.format(user, temp_args))
-            result = test_cmd(temp_args)
+            # print("cmd", cmd.__dict__)
+            # print(args)
+            # if "." in args[0]:
+            #     user = args[0]
+            #     cmd.cmdID = int(args[1])
+            #     temp_args = args[2:]
+            # else:
+            #     user = "?.?"
+            #     temp_args = args
+            user = f"{cmd.userID}.{cmd.cmdID}"
+            log.info('{} issued {}'.format(user, args))
+            result = test_cmd(args)
             if result is False:
                 return
             # cmd.cmdBody = " ".join(temp_args)
-            alerts_parser(temp_args, obj=dict(actor=self, cmd=cmd, user=user))
+            alerts_parser(args, obj=dict(actor=self, cmd=cmd, user=user))
         except CommandError as ee:
             log.warning("command {} failed with {}".format(cmd.cmdStr, strFromException(ee)))
             cmd.setState('failed', textMsg=strFromException(ee))
