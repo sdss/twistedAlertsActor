@@ -187,14 +187,16 @@ class alertsActor(BaseActor):
             # current tron config passes user, we aren't handling that yet
             # print("cmd", cmd.__dict__)
             # print(args)
-            # if "." in args[0]:
-            #     user = args[0]
-            #     cmd.cmdID = int(args[1])
-            #     temp_args = args[2:]
-            # else:
-            #     user = "?.?"
-            #     temp_args = args
-            user = f"{cmd.userID}.{cmd.cmdID}"
+            if "." in args[0]:
+                user = args[0]
+                cmd.cmdID = int(args[1])
+                temp_args = args[2:]
+            else:
+                # user = "?.?"
+                user = f"{cmd.userID}.{cmd.cmdID}"
+                temp_args = args
+            args = temp_args
+            # user = f"{cmd.userID}.{cmd.cmdID}"
             log.info('{} issued {}'.format(user, args))
             result = test_cmd(args)
             if result is False:
