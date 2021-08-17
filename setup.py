@@ -19,7 +19,7 @@ import sys
 # The NAME variable should be of the format "sdss-alertsActor".
 # Please check your NAME adheres to that format.
 NAME = 'sdss-alertsActor'
-VERSION = '2.1.1dev'
+VERSION = '2.1.1'
 RELEASE = 'dev' in VERSION
 
 
