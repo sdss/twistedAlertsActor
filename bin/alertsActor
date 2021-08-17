@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# alerts_main.py
+#
+
+import os
+
+from twisted.internet import reactor
+
+from sdsstools.daemonizer import DaemonGroup
+
+from alertsActor import config, __version__
+# from alertsActor.logger import log
+from alertsActor.alerts_main import alertsActor
+
+import click
+
+if "ACTOR_DAEMON_LOG_DIR" in os.environ:
+    LOG_FILE = "$ACTOR_DAEMON_LOG_DIR/apoActor/apoActor.log"
+else:
+    LOG_FILE = "$HOME/logs/apoActor/apoActor.log"
+
+
+@click.group(cls=DaemonGroup, prog="alertsActor-actor", log_file=LOG_FILE)
+def alerts_cmd(debug=False):
+
+    port = config['tron']['port']
+
+    alertsActor(config, userPort=port, version=__version__)
+
+    reactor.run()
+
+
+if __name__ == '__main__':
+    alerts_cmd()
