@@ -19,8 +19,8 @@ import time
 
 from click.testing import CliRunner
 
-from RO.StringUtil import strFromException
-from RO.Comm.TwistedTimer import Timer
+from opscore.RO.StringUtil import strFromException
+from opscore.RO.Comm.TwistedTimer import Timer
 from opscore.utility.qstr import qstr
 from twistedActor import BaseActor, CommandError, UserCmd
 

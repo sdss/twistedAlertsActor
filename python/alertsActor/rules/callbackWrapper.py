@@ -6,7 +6,7 @@
 # Created by John Donor on 9 Mar 2018.
 
 import time
-from RO.Comm.TwistedTimer import Timer
+from opscore.RO.Comm.TwistedTimer import Timer
 
 from alertsActor import log
 
