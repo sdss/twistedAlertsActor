@@ -4,10 +4,10 @@
 #
 
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
+# from __future__ import division
+# from __future__ import print_function
+# from __future__ import absolute_import
+# from __future__ import unicode_literals
 
 from setuptools import setup, find_packages
 
@@ -18,7 +18,7 @@ import sys
 
 # The NAME variable should be of the format "sdss-alertsActor".
 # Please check your NAME adheres to that format.
-NAME = 'alertsActor'
+NAME = 'sdss-alertsActor'
 VERSION = '2.0.1'
 RELEASE = 'dev' in VERSION
 
@@ -38,7 +38,7 @@ def run(packages, install_requires):
           packages=packages,
           install_requires=install_requires,
           package_dir={'': 'python'},
-          scripts=['bin/alertsActor'],
+          scripts=['bin/alerts_main.py'],
           classifiers=[
               'Development Status :: 4 - Beta',
               'Intended Audience :: Science/Research',
@@ -46,8 +46,7 @@ def run(packages, install_requires):
               'Natural Language :: English',
               'Operating System :: OS Independent',
               'Programming Language :: Python',
-              'Programming Language :: Python :: 2.6',
-              'Programming Language :: Python :: 2.7',
+              'Programming Language :: Python :: 3.7',
               'Topic :: Documentation :: Sphinx',
               'Topic :: Software Development :: Libraries :: Python Modules',
           ],
@@ -57,16 +56,19 @@ def run(packages, install_requires):
 def get_requirements(opts):
     ''' Get the proper requirements file based on the optional argument '''
 
-    if opts.dev:
-        name = 'requirements_dev.txt'
-    elif opts.doc:
-        name = 'requirements_doc.txt'
-    else:
-        name = 'requirements.txt'
+    names = ['requirements.txt']
 
-    requirements_file = os.path.join(os.path.dirname(__file__), name)
-    install_requires = [line.strip().replace('==', '>=') for line in open(requirements_file)
-                        if not line.strip().startswith('#') and line.strip() != '']
+    if opts.dev:
+        names.append('requirements_dev.txt')
+        names.append('requirements_doc.txt')
+    elif opts.doc:
+        names.append('requirements_doc.txt')
+
+    install_requires = list()
+    for n in names:
+        requirements_file = os.path.join(os.path.dirname(__file__), n)
+        install_requires .extend([line.strip().replace('==', '>=') for line in open(requirements_file)
+                            if not line.strip().startswith('#') and line.strip() != ''])
     return install_requires
 
 

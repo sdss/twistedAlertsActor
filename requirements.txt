@@ -1,7 +1,5 @@
 pyyaml
 pygments
-twistedActor
-opscore
-RO
+sdss-opscore
 twilio
 click<=6.7
