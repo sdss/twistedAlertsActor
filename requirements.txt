@@ -1,8 +1,0 @@
-pyyaml
-pygments
-sdss-opscore
-twilio
-click<=6.7
-pyparsing
-sdsstools
-sdss-twistedActor
