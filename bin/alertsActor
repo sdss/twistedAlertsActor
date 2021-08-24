@@ -17,9 +17,9 @@ from alertsActor.alerts_main import alertsActor
 import click
 
 if "ACTOR_DAEMON_LOG_DIR" in os.environ:
-    LOG_FILE = "$ACTOR_DAEMON_LOG_DIR/apoActor/apoActor.log"
+    LOG_FILE = "$ACTOR_DAEMON_LOG_DIR/alertsActor/alertsActor.log"
 else:
-    LOG_FILE = "$HOME/logs/apoActor/apoActor.log"
+    LOG_FILE = "$HOME/logs/alertsActor/alertsActor.log"
 
 
 @click.group(cls=DaemonGroup, prog="alertsActor-actor", log_file=LOG_FILE)
