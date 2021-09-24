@@ -23,7 +23,6 @@ from alertsActor.cmds.disable import disable
 from alertsActor.cmds.instrumentState import instrumentState
 
 
-
 __all__ = ('alerts_parser')
 
 

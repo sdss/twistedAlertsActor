@@ -25,8 +25,8 @@ __all__ = ('acknowledge')
 def acknowledge(actor, cmd, user, id=None, severity='info', message=None):
     """acknowledge an alert"""
 
-    if isinstance(id, unicode):
-        id = str(id)  # .decode("utf-8")
+    # if isinstance(id, unicode):
+    #     id = str(id)  # .decode("utf-8")
 
     keyword = actor.monitoring[id]
     

@@ -18,18 +18,18 @@ __all__ = ('unacknowledge')
 
 @click.command()
 @click.argument('alertkey', nargs=1, default=None, required=True)
-@click.argument('severity', nargs=1, default='info', 
-                type=click.Choice(['ok', 'info', 'apogeediskwarn','warn', 'serious', 'critical']))
+@click.argument('severity', nargs=1, default='info',
+                type=click.Choice(['ok', 'info', 'apogeediskwarn', 'warn', 'serious', 'critical']))
 @click.option('-m', '--message', multiple=True, default=None, help='a short message to hang on to')
 @alerts_context
 def unacknowledge(actor, cmd, user, alertkey=None, severity='info', message=None):
     """unacknowledge an alert"""
 
-    if isinstance(alertkey, unicode):
-        alertkey = str(alertkey)  # .decode("utf-8")
+    # if isinstance(alertkey, unicode):
+    #     alertkey = str(alertkey)  # .decode("utf-8")
 
     keyword = actor.monitoring[alertkey]
-    
+
     if keyword.severity != severity:
         cmd.setState(cmd.Failed, "Severity does not match alert severity")
         return None

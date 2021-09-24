@@ -24,8 +24,8 @@ __all__ = ('enable')
 def enable(actor, cmd, user, alertkey=None, severity='info'):
     """enable an alert"""
 
-    if isinstance(alertkey, unicode):
-        alertkey = str(alertkey)  # .decode("utf-8")
+    # if isinstance(alertkey, unicode):
+    #     alertkey = str(alertkey)  # .decode("utf-8")
 
     keyword = actor.monitoring[alertkey]
 

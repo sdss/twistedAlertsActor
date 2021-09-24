@@ -64,11 +64,8 @@ class alertsActor(BaseActor):
         log.info('starting alertsActor actor version={!r} in port={}'
                  .format(__version__, kwargs['userPort']))
 
-
-
     def addKey(self, key, severity, **kwargs):
         self.monitoring[key] = keyState(self, actorKey=key, severity=severity, **kwargs)
-
 
     @property
     def activeAlerts(self):
@@ -79,7 +76,6 @@ class alertsActor(BaseActor):
 
         return active
 
-
     @property
     def disabledAlerts(self):
         disabled = []
@@ -89,12 +85,10 @@ class alertsActor(BaseActor):
 
         return disabled
 
-
     def broadcastActive(self):
         activeMessage = "activeAlerts{}".format(("=" if len(self.activeAlerts) else "")) +\
                        ", ".join(["{}".format(a.actorKey) for a in self.activeAlerts])
         self.writeToUsers("i", activeMessage)
-
 
     def broadcastDisabled(self):
         disabledMessage = "disabledAlertRules{}".format(("=" if len(self.disabledAlerts) else "")) +\
@@ -102,11 +96,9 @@ class alertsActor(BaseActor):
                                   for a in self.disabledAlerts])
         self.writeToUsers("i", disabledMessage)
 
-
     def broadcastAll(self):
         for a in self.activeAlerts:
             a.dispatchAlertMessage()
-
 
     def broadcastInstruments(self):
         instruments = list()
@@ -119,7 +111,6 @@ class alertsActor(BaseActor):
         self.writeToUsers("i", 'instrumentNames={}'.format(",".join(instruments)))
         self.writeToUsers("i", 'downInstruments={}'.format(",".join(down)))
 
-    
     def reconnect(self):
         # convenience method to call occassionally
         # should be able to recover from a hub disconnect
@@ -141,7 +132,6 @@ class alertsActor(BaseActor):
         self.reconnect()
 
         return self.hub.datamodel
-
 
     def parseAndDispatchCmd(self, cmd):
         """Dispatch the user command. Stolen from BMO."""

@@ -18,14 +18,14 @@ __all__ = ('disable')
 
 @click.command()
 @click.argument('alertkey', nargs=1, default=None, required=True)
-@click.argument('severity', nargs=1, default='info', 
-                type=click.Choice(['ok', 'info', 'apogeediskwarn','warn', 'serious', 'critical']))
+@click.argument('severity', nargs=1, default='info',
+                type=click.Choice(['ok', 'info', 'apogeediskwarn', 'warn', 'serious', 'critical']))
 @alerts_context
 def disable(actor, cmd, user, alertkey=None, severity='info'):
     """disable an alert"""
 
-    if isinstance(alertkey, unicode):
-        alertkey = str(alertkey)
+    # if isinstance(alertkey, unicode):
+    #     alertkey = str(alertkey)
 
     keyword = actor.monitoring[alertkey]
 
