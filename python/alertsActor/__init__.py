@@ -53,4 +53,4 @@ except AttributeError:
 
     alertActions = yaml.load(open(actionsFile))
 
-__version__ = '2.1.4'
+__version__ = '2.1.5'
