@@ -35,7 +35,11 @@ def status(actor, cmd, user):
 
     cmd.setState(cmd.Done, "Now you know all I know")
 
-    dontClutterSDSSUser = os.getlogin()
+    try:
+        dontClutterSDSSUser = os.getlogin()
+    except OSError:
+        # when run as a daemon, getlogin will fail
+        dontClutterSDSSUser = "sdss5"
     if "sdss" in dontClutterSDSSUser:
         with open("/data/logs/actors/alerts/alerts.hubModel.yaml", "w") as dump:
             print(yaml.dump(actor.hubModel), file=dump)
