@@ -28,7 +28,7 @@ def sendEmail(keyState, mailClient):
 
     msg['Subject'] = subject
 
-    msg['From'] = "%sAlerts (SDSS-IV %s Alerts)" % (2 * (severity.capitalize(), ))
+    msg['From'] = "%sAlerts (SDSS-V %s Alerts)" % (2 * (severity.capitalize(), ))
 
     msg['Reply-to'] = sender
 

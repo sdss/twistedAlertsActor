@@ -266,7 +266,6 @@ class keyState(object):
 
         assert self.severity in ['ok', 'info', 'apogeediskwarn', 'warn', 'serious', 'critical'], "severity level not allowed"
 
-
     def keywordFmt(self):
         if "heartbeat" in self.actorKey:
             instring = "at {time}; last seen {diff} sec ago".format(time=self.triggeredTime,
@@ -282,7 +281,6 @@ class keyState(object):
                severity=self.severity, enable=enabled(self.disabled), acknowledged=ack(self.acknowledged),
                acknowledger=self.acknowledger)
 
-
     @property
     def instDown(self):
         if self.instruments is None:
@@ -294,13 +292,12 @@ class keyState(object):
         else:
             return False
 
-
     def stampTime(self):
         self.triggeredTime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
 
     def setActive(self, severity=None):
         # something cause a problem, do stuff
-        self.acknowledged = False # clear anything from old alert
+        self.acknowledged = False  # clear anything from old alert
         self.active = True
         if severity is None:
             self.severity = self.defaultSeverity
@@ -318,7 +315,6 @@ class keyState(object):
         # give the alert a chance to clear before emailing everyone
         self.emailTimer.start(self.emailDelay, self.sendEmail)
 
-
     def clear(self):
         # everything good, back to normal
         self.active = False
@@ -334,7 +330,6 @@ class keyState(object):
         self.alertsActorReference.broadcastDisabled()
         self.alertsActorReference.broadcastAll()
 
-
     def acknowledge(self, msg=None, acknowledgedBy=None, unack=False):
         if msg is not None:
             self.acknowledgeMsg += msg + ";" # so we can add many... I guess?
@@ -348,7 +343,6 @@ class keyState(object):
             self.acknowledged = True
 
         self.dispatchAlertMessage()
-
 
     def reevaluate(self):
         # at some point this will presumably raise alert level?
@@ -377,10 +371,9 @@ class keyState(object):
         self.dispatchAlertMessage()
         self.checkMe.start(self.checkAfter, self.reevaluate)
 
-
     def sendEmail(self):
         # notify over email
-        if self.emailAddresses is None:
+        if self.emailAddresses is None or self.disabled:
             return
 
         if self.emailSent:
@@ -397,7 +390,6 @@ class keyState(object):
         # sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
         self.emailSent = True
 
-
     def dispatchAlertMessage(self):
         # write an alert to users
 
@@ -410,8 +402,7 @@ class keyState(object):
 
         self.alertsActorReference.writeToUsers(broadcastSeverity, self.msg)
 
-        log.info("ALERT! "+ self.msg)
-
+        log.info("ALERT! " + self.msg)
 
     def checkKey(self):
         # check key, should be called when keyword changes
@@ -439,7 +430,6 @@ class keyState(object):
         # self.active = False
 
         # probably do some more stuff
-
 
     def enable(self):
         self.disabled = False
