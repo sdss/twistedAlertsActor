@@ -53,7 +53,6 @@ class camCheck(YAMLObject):
         # NEVER GETS CALLED!!!! -_-
         pass
 
-
     def generateCamCheckAlert(self, key, severity):
         inst = key[:3]
         side = key[3]
@@ -200,6 +199,7 @@ class inList(YAMLObject):
         else:
             return "ok"
 
+
 class firstElem(YAMLObject):
     """is any value in the list "True", e.g. flagged
     """
@@ -211,6 +211,7 @@ class firstElem(YAMLObject):
             return keyState.defaultSeverity
         else:
             return "ok"
+
 
 class default(object):
     """check equality to a dangerval
