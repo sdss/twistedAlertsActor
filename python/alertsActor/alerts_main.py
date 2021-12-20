@@ -270,6 +270,10 @@ class keyState(object):
         if "heartbeat" in self.actorKey:
             instring = "at {time}; last seen {diff} sec ago".format(time=self.triggeredTime,
                                                                     diff=int(time.time()-self.lastalive))
+        elif "stale" in self.actorKey:
+            instring = "at {time}; no change for {diff} sec, with {keyword}".format(time=self.triggeredTime,
+                                                                    diff=int(time.time()-self.lastalive),
+                                                                    keyword=parseKey(self.keyword))
         else:
             instring = 'at {time} UT found {keyword}'.format(keyword=parseKey(self.keyword), time=self.triggeredTime)
         return qstr(instring)

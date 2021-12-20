@@ -111,6 +111,8 @@ class wrapCallbacks(object):
         def check(newKeyval, init=False):
             if len(newKeyval) == 1:
                 newKeyval = newKeyval[0]
+            if init:
+                self.alertsActor.monitoring[staleKey].keyword = 0
             if requireChange:
                 # val has to change to reset timer, e.g. BPR
                 # definitely don't want to do this for string keys
@@ -130,7 +132,7 @@ class wrapCallbacks(object):
             self.alertsActor.monitoring[actorKey].keyword = newKeyval
             self.alertsActor.monitoring[actorKey].checkKey()
 
-        check("init", init=True)
+        check([-9999], init=True)
 
         return check
 
