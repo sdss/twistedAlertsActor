@@ -53,8 +53,11 @@ class wrapCallbacks(object):
                                         severity=actions['severity'],
                                         **otherArgs)
 
+                requireChange = actions.get("requireChange", False)
+
                 callback = self.updateKeyStale(key,
-                                               checkAfter=actions['stale'])
+                                               checkAfter=actions['stale'],
+                                               requireChange=requireChange)
                 self.datamodel_callbacks[key] = callback
 
             else:
@@ -94,7 +97,7 @@ class wrapCallbacks(object):
 
         return startTime
 
-    def updateKeyStale(self, actorKey, checkAfter=30):
+    def updateKeyStale(self, actorKey, checkAfter=30, requireChange=False):
         """Update the create a "stale" heartbeat for a specified actorKey.
            The timer is restarted everytime its called, if it isn't restarted
            in time, a "stale" alert is raised
@@ -108,6 +111,11 @@ class wrapCallbacks(object):
         def check(newKeyval, init=False):
             if len(newKeyval) == 1:
                 newKeyval = newKeyval[0]
+            if requireChange:
+                # val has to change to reset timer, e.g. BPR
+                # definitely don't want to do this for string keys
+                if abs(self.alertsActor.monitoring[staleKey].keyword - newKeyval) < 0.1:
+                    return None
             # also do the heartbeat
             self.alertsActor.monitoring[staleKey].keyword = newKeyval
             self.alertsActor.monitoring[staleKey].lastalive = time.time()

@@ -76,16 +76,46 @@ apogee.arrayPower:
   emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu','kpan@apo.nmsu.edu']
   checker: !!python/object/new:alertsActor.rules.dangerKey.neq {}
 
-apogeebpr.BPRInletTemp:
+# #######################################
+# apogeebpr
+# #######################################
+
+apogeebpr.BPREncTemp:
   cast: !!python/name:float
-  severity: critical
-  heartbeat: apogeebpr
-  checkAfter: 7200
+  severity: serious
+  dangerVal: 50
+  # 21600 sec -> 6 hrs
+  stale: 21600
+  requireChange: True
   emailDelay: 120
   emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
   selfClear: True
-  instruments: [apogee]
-  checker: !!python/object/new:alertsActor.rules.dangerKey.heartbeatCheck {}
+  instruments: [apogee, apogeebpr]
+  checker: !!python/object/new:alertsActor.rules.dangerKey.above {}
+apogeebpr.BPROutletTemp:
+  cast: !!python/name:float
+  severity: serious
+  dangerVal: 5
+  # 21600 sec -> 6 hrs
+  stale: 21600
+  requireChange: True
+  emailDelay: 120
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  selfClear: True
+  instruments: [apogee, apogeebpr]
+  checker: !!python/object/new:alertsActor.rules.dangerKey.below {}
+apogeebpr.BPRManPress:
+  cast: !!python/name:float
+  severity: serious
+  dangerVal: 250
+  # 21600 sec -> 6 hrs
+  stale: 21600
+  requireChange: True
+  emailDelay: 120
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  selfClear: True
+  instruments: [apogee, apogeebpr]
+  checker: !!python/object/new:alertsActor.rules.dangerKey.above {}
 # #######################################
 # apogeeql
 # #######################################
@@ -93,7 +123,7 @@ apogeeql.rootURL:
   cast: !!python/name:str
   severity: critical
   heartbeat: apogeeql
-  checkAfter: 180
+  checkAfter: 600
   emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
   selfClear: True
   checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
