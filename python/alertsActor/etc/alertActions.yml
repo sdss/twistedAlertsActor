@@ -216,11 +216,11 @@ boss.specMechProtocol:
   emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
   dangerVal: 0
   selfClear: True
-  checkAfter: 30
+  checkAfter: 60
 boss.camCheck:
-  cast: !!python/name:str  # possibly tuple!
+  cast: !!python/name:str
   severity: warn
-  stale: 60
+  stale: 120
   instruments: [boss]
   emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
   checker: !!python/object:alertsActor.rules.dangerKey.camCheck 
