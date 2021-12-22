@@ -82,37 +82,43 @@ apogee.arrayPower:
 
 apogeebpr.BPREncTemp:
   cast: !!python/name:float
-  severity: serious
+  severity: critical
   dangerVal: 50
   # 21600 sec -> 6 hrs
   stale: 21600
   requireChange: True
   emailDelay: 120
-  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 
+                   'kpan@apo.nmsu.edu', 'jcw6z@virginia.edu', 'jimmy@virginia.edu',
+                   'mjn4n@virginia.edu']
   selfClear: True
   instruments: [apogee, apogeebpr]
   checker: !!python/object/new:alertsActor.rules.dangerKey.above {}
 apogeebpr.BPROutletTemp:
   cast: !!python/name:float
-  severity: serious
+  severity: critical
   dangerVal: 5
   # 21600 sec -> 6 hrs
   stale: 21600
   requireChange: True
   emailDelay: 120
-  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu',
+                   'kpan@apo.nmsu.edu', 'jcw6z@virginia.edu', 'jimmy@virginia.edu',
+                   'mjn4n@virginia.edu']
   selfClear: True
   instruments: [apogee, apogeebpr]
   checker: !!python/object/new:alertsActor.rules.dangerKey.below {}
 apogeebpr.BPRManPress:
   cast: !!python/name:float
-  severity: serious
+  severity: critical
   dangerVal: 250
   # 21600 sec -> 6 hrs
   stale: 21600
   requireChange: True
   emailDelay: 120
-  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu',
+                   'kpan@apo.nmsu.edu', 'jcw6z@virginia.edu', 'jimmy@virginia.edu',
+                   'mjn4n@virginia.edu']
   selfClear: True
   instruments: [apogee, apogeebpr]
   checker: !!python/object/new:alertsActor.rules.dangerKey.above {}
