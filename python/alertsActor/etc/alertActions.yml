@@ -85,7 +85,7 @@ apogeebpr.BPREncTemp:
   severity: critical
   dangerVal: 50
   # 21600 sec -> 6 hrs
-  stale: 21600
+  stale: 43200
   requireChange: True
   emailDelay: 120
   emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 
@@ -231,3 +231,81 @@ boss.camCheck:
   emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
   checker: !!python/object:alertsActor.rules.dangerKey.camCheck 
     {alertsActor: null, triggered: [], emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']}
+
+# #######################################
+# fps
+# #######################################
+jaeger.alive_at:
+  cast: !!python/name:float
+  severity: critical
+  # emailDelay: uses checkAfter by default
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  heartbeat: fps
+  checkAfter: 120
+  selfClear: True
+  checker: !!python/object:alertsActor.rules.dangerKey.heartbeatCheck {}
+  instruments: [fps]
+jaeger.alert_gfa_temp_critical:
+  cast: !!python/name:int
+  severity: critical
+  dangerVal: 1
+  emailDelay: 60
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  checkAfter: 120
+  instruments: [fps]
+jaeger.alert_gfa_temp_warning:
+  cast: !!python/name:int
+  severity: critical
+  dangerVal: 1
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  checkAfter: 120
+  selfClear: True
+  instruments: [fps]
+jaeger.alert_ieb_temp_critical:
+  cast: !!python/name:int
+  severity: critical
+  dangerVal: 1
+  emailDelay: 60
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  checkAfter: 120
+  instruments: [fps]
+jaeger.alert_ieb_temp_warning:
+  cast: !!python/name:int
+  severity: critical
+  dangerVal: 1
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  checkAfter: 120
+  selfClear: True
+  instruments: [fps]
+jaeger.alert_robot_temp_critical:
+  cast: !!python/name:int
+  severity: critical
+  dangerVal: 1
+  emailDelay: 60
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  checkAfter: 120
+  instruments: [fps]
+jaeger.alert_robot_temp_warning:
+  cast: !!python/name:int
+  severity: critical
+  dangerVal: 1
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  checkAfter: 120
+  selfClear: True
+  instruments: [fps]
+jaeger.alert_fps_flow:
+  cast: !!python/name:int
+  severity: serious
+  dangerVal: 1
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  checkAfter: 120
+  selfClear: True
+  instruments: [fps]
+jaeger.alert_dew_point:
+  cast: !!python/name:int
+  severity: serious
+  dangerVal: 1
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  checkAfter: 120
+  selfClear: True
+  instruments: [fps]
