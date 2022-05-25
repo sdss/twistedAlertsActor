@@ -46,7 +46,7 @@ class wrapCallbacks(object):
                                         checker=staleCheck,
                                         instruments=actions['instruments'],
                                         emailAddresses=actions['emailAddresses'],
-                                        emailDelay=actions['stale']*2)
+                                        emailDelay=actions.get('emailDelay', 120))
 
                 alertKey = key
                 self.alertsActor.addKey(alertKey,

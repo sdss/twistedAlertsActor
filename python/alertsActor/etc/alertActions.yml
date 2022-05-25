@@ -84,9 +84,6 @@ apogeebpr.BPREncTemp:
   cast: !!python/name:float
   severity: critical
   dangerVal: 50
-  # 21600 sec -> 6 hrs
-  stale: 43200
-  requireChange: True
   emailDelay: 120
   emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 
                    'kpan@apo.nmsu.edu', 'jcw6z@virginia.edu', 'jimmy@virginia.edu',
@@ -95,6 +92,17 @@ apogeebpr.BPREncTemp:
   instruments: [apogee, apogeebpr]
   checker: !!python/object/new:alertsActor.rules.dangerKey.above {}
 apogeebpr.BPROutletTemp:
+  cast: !!python/name:float
+  severity: critical
+  dangerVal: 5
+  emailDelay: 120
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu',
+                   'kpan@apo.nmsu.edu', 'jcw6z@virginia.edu', 'jimmy@virginia.edu',
+                   'mjn4n@virginia.edu']
+  selfClear: True
+  instruments: [apogee, apogeebpr]
+  checker: !!python/object/new:alertsActor.rules.dangerKey.below {}
+apogeebpr.BPRInletTemp:
   cast: !!python/name:float
   severity: critical
   dangerVal: 5
@@ -308,4 +316,28 @@ jaeger.alert_dew_point:
   emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
   checkAfter: 120
   selfClear: True
+  instruments: [fps]
+jaeger.alert_chiller_dew_point:
+  cast: !!python/name:int
+  severity: serious
+  dangerVal: 1
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  checkAfter: 120
+  selfClear: True
+  instruments: [fps]
+jaeger.alert_fluid_temperature:
+  cast: !!python/name:int
+  severity: serious
+  dangerVal: 1
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  checkAfter: 120
+  selfClear: True
+  instruments: [fps]
+jaeger.alert_chiller_fault:
+  cast: !!python/name:int
+  severity: serious
+  dangerVal: 1
+  emailAddresses: ['critical-alerts@apo.nmsu.edu', 'j.donor@tcu.edu', 'gallegoj@uw.edu', 'kpan@apo.nmsu.edu']
+  checkAfter: 120
+  selfClear: False
   instruments: [fps]
