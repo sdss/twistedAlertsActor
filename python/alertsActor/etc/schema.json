@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {},
+  "type": "object",
+  "patternProperties": {},
+  "properties": {
+    "alert": {
+      "type": "object",
+      "properties": {
+        "keyword": { "type": "string" },
+        "value": { "type": "string" },
+        "timeStamp": { "type": "string" },
+        "severity": { "type": "string" },
+        "disabled": { "type": "bool" },
+        "acknowledged": { "type": "bool" },
+        "acknowledger": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "instrumentStatus": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "disabled": { "type": "bool" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

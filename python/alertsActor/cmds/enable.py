@@ -3,38 +3,25 @@
 #
 # enable.py
 
-
-
-from __future__ import division
-from __future__ import print_function
-from __future__ import absolute_import
-
 import click
 
-from alertsActor.cmds import alerts_context
-
-__all__ = ('enable')
+from alertsActor.cmds import parser
 
 
-@click.command()
-@click.argument('alertkey', nargs=1, default=None, required=True)
-@click.argument('severity', nargs=1, default='info', 
-                type=click.Choice(['ok', 'info', 'apogeediskwarn','warn', 'serious', 'critical']))
-@alerts_context
-def enable(actor, cmd, user, alertkey=None, severity='info'):
+@parser.command()
+@click.argument('alertkey', type=str, required=True,
+                help='alert to disable')
+async def enable(command, alertkey=None):
     """enable an alert"""
 
-    # if isinstance(alertkey, unicode):
-    #     alertkey = str(alertkey)  # .decode("utf-8")
+    actor = command.actor
 
     keyword = actor.monitoring[alertkey]
 
-    keyword.enable()
+    await keyword.enable()
 
-    actor.broadcastActive()
-    actor.broadcastDisabled()
-    actor.broadcastAll()
+    await actor.broadcastActive()
+    await actor.broadcastDisabled()
+    await actor.broadcastAll()
 
-    cmd.setState(cmd.Done, 'enabled')
-
-    return False
+    return command.finish()

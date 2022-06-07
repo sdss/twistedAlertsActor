@@ -3,37 +3,32 @@
 #
 # status.py
 
-
-from __future__ import division
-from __future__ import print_function
-from __future__ import absolute_import
-
 import os
 import yaml
 
 import click
 
-from alertsActor.cmds import alerts_context
+from alertsActor.cmds import parser
+from alertsActor.tools import wrapBlocking
 
-__all__ = ('status')
+
+def dumpModel(model, path=None):
+    if path is None:
+        path = "alerts.hubModel.yaml"
+    with open(path, "w") as dump:
+        print(yaml.dump(model), file=dump)
 
 
-@click.command()
-@alerts_context
-def status(actor, cmd, user):
+@parser.command()
+async def status(command):
     """returns actor status"""
 
-    # print("current model: ")
-    # for k, v in actor.hubModel.items():
-    #     print(k, v)
-    #     print("\n \n")
+    actor = command.actor
 
-    actor.broadcastActive()
-    actor.broadcastDisabled()
-    actor.broadcastAll()
-    actor.broadcastInstruments()
-
-    cmd.setState(cmd.Done, "Now you know all I know")
+    await actor.broadcastActive()
+    await actor.broadcastDisabled()
+    await actor.broadcastAll()
+    await actor.broadcastInstruments()
 
     try:
         dontClutterSDSSUser = os.getlogin()
@@ -41,14 +36,13 @@ def status(actor, cmd, user):
         # when run as a daemon, getlogin will fail
         dontClutterSDSSUser = "sdss5"
     if "sdss" in dontClutterSDSSUser:
-        with open("/data/logs/actors/alerts/alerts.hubModel.yaml", "w") as dump:
-            print(yaml.dump(actor.hubModel), file=dump)
+        path = "/data/logs/actors/alerts/alerts.hubModel.yaml"
+        await wrapBlocking(actor.hubModel, path)
 
     # otherwise we can clutter the home directory a bit
     # write a log of the hubModel for posterity
     else:
-        with open("alerts.hubModel.yaml", "w") as dump:
-            print(yaml.dump(actor.hubModel), file=dump)
+        path = "alerts.hubModel.yaml"
+        await wrapBlocking(actor.hubModel, path)
 
-
-    return False
+    return command.finish(text="Now you know all I know")

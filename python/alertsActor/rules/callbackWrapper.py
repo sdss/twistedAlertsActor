@@ -6,7 +6,7 @@
 # Created by John Donor on 9 Mar 2018.
 
 import time
-from opscore.RO.Comm.TwistedTimer import Timer
+from alertsActor.tools import Timer
 
 from alertsActor import log
 
@@ -19,11 +19,11 @@ class wrapCallbacks(object):
     def __init__(self, alertsActor, keywords):
         # keywords read from config
         self.alertsActor = alertsActor
-        self.datamodel_casts = dict()
+        # self.datamodel_casts = dict()
         self.datamodel_callbacks = dict()
 
         for key, actions in keywords.items():
-            self.datamodel_casts[key] = actions['cast']
+            # self.datamodel_casts[key] = actions['cast']
 
             initKeys = ('cast', 'severity', 'heartbeat', 'stale')
 
@@ -31,40 +31,40 @@ class wrapCallbacks(object):
 
             if 'heartbeat' in actions.keys():
                 alertKey = actions['heartbeat'] + '.heartbeat'
-                self.alertsActor.addKey(alertKey,
-                                        severity=actions['severity'],
-                                        **otherArgs)
-                callback = self.pulse(alertKey=alertKey,
-                                      checkAfter=actions['checkAfter'])
+                await self.alertsActor.addKey(alertKey,
+                                              severity=actions['severity'],
+                                              **otherArgs)
+                callback = await self.pulse(alertKey=alertKey,
+                                            checkAfter=actions['checkAfter'])
                 self.datamodel_callbacks[key] = callback
 
             elif 'stale' in actions.keys():
                 staleKey = key + ".stale"
-                self.alertsActor.addKey(staleKey, severity=actions['severity'],
-                                        checkAfter=actions['stale'],
-                                        selfClear=True,
-                                        checker=staleCheck,
-                                        instruments=actions['instruments'],
-                                        emailAddresses=actions['emailAddresses'],
-                                        emailDelay=actions.get('emailDelay', 120))
+                await self.alertsActor.addKey(staleKey, severity=actions['severity'],
+                                              checkAfter=actions['stale'],
+                                              selfClear=True,
+                                              checker=staleCheck,
+                                              instruments=actions['instruments'],
+                                              emailAddresses=actions['emailAddresses'],
+                                              emailDelay=actions.get('emailDelay', 120))
 
                 alertKey = key
-                self.alertsActor.addKey(alertKey,
-                                        severity=actions['severity'],
-                                        **otherArgs)
+                await self.alertsActor.addKey(alertKey,
+                                              severity=actions['severity'],
+                                              **otherArgs)
 
                 requireChange = actions.get("requireChange", False)
 
-                callback = self.updateKeyStale(key,
-                                               checkAfter=actions['stale'],
-                                               requireChange=requireChange)
+                callback = await self.updateKeyStale(key,
+                                                     checkAfter=actions['stale'],
+                                                     requireChange=requireChange)
                 self.datamodel_callbacks[key] = callback
 
             else:
                 alertKey = key
-                self.alertsActor.addKey(alertKey,
-                                        severity=actions['severity'],
-                                        **otherArgs)
+                await self.alertsActor.addKey(alertKey,
+                                              severity=actions['severity'],
+                                              **otherArgs)
                 callback = self.updateKey(key)
                 self.datamodel_callbacks[key] = callback
 
@@ -72,7 +72,7 @@ class wrapCallbacks(object):
                 for i in actions["instruments"]:
                     alertsActor.instrumentDown[i] = False
 
-    def pulse(self, alertKey='NOT_SPECIFIED', checkAfter=30):
+    async def pulse(self, alertKey='NOT_SPECIFIED', checkAfter=30):
         """Update the heartbeat for a specified actor.
            The timer is restarted everytime its called, if it isn't restarted
            in time, a "dead actor" alert is raised
@@ -82,7 +82,7 @@ class wrapCallbacks(object):
 
         deadCallback = self.itsDeadJim(alertKey=alertKey)
 
-        def startTime(newKeyval):
+        async def startTime(newKeyval):
             # called as callback, so the updated key is passed by default
             # print('pulse: ', alertKey, newKeyval[0])
             log.info('{}: the actor said {}'.format(alertKey, newKeyval))
@@ -91,13 +91,13 @@ class wrapCallbacks(object):
             self.alertsActor.monitoring[alertKey].keyword = newKeyval[0]
             self.alertsActor.monitoring[alertKey].lastalive = time.time()
             self.alertsActor.heartbeats[alertKey].start(checkAfter, deadCallback)
-            self.alertsActor.monitoring[alertKey].checkKey()
+            await self.alertsActor.monitoring[alertKey].checkKey()
 
-        startTime(["init"])  # call now so it raises error?
+        await startTime(["init"])  # call now so it raises error?
 
         return startTime
 
-    def updateKeyStale(self, actorKey, checkAfter=30, requireChange=False):
+    async def updateKeyStale(self, actorKey, checkAfter=30, requireChange=False):
         """Update the create a "stale" heartbeat for a specified actorKey.
            The timer is restarted everytime its called, if it isn't restarted
            in time, a "stale" alert is raised
