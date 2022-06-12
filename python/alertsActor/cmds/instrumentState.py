@@ -36,8 +36,6 @@ async def instrumentState(command, instrument=None, state="up", user=None):
 
     actor = command.actor
 
-    await actor.broadcastActive()
-    await actor.broadcastDisabled()
     await actor.broadcastAll()
     await actor.broadcastInstruments()
 

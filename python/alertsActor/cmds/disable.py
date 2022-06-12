@@ -25,8 +25,6 @@ async def disable(command, alertkey=None, user=None):
 
     await keyword.disable(user)
 
-    await actor.broadcastActive()
-    await actor.broadcastDisabled()
     await actor.broadcastAll()
 
     return command.finish()

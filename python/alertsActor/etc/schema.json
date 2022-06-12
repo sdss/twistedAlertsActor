@@ -4,7 +4,7 @@
   "type": "object",
   "patternProperties": {},
   "properties": {
-    "alert": {
+    "alert[a-zA-Z]": {
       "type": "object",
       "properties": {
         "keyword": { "type": "string" },
@@ -17,7 +17,7 @@
       },
       "additionalProperties": false
     },
-    "instrumentStatus": {
+    "instrumentStatus[a-zA-Z]": {
       "type": "object",
       "properties": {
         "name": { "type": "string" },

@@ -20,8 +20,6 @@ async def enable(command, alertkey=None):
 
     await keyword.enable()
 
-    await actor.broadcastActive()
-    await actor.broadcastDisabled()
     await actor.broadcastAll()
 
     return command.finish()

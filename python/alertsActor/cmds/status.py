@@ -25,8 +25,6 @@ async def status(command):
 
     actor = command.actor
 
-    await actor.broadcastActive()
-    await actor.broadcastDisabled()
     await actor.broadcastAll()
     await actor.broadcastInstruments()
 

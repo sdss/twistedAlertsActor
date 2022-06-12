@@ -44,8 +44,7 @@ class alertsActor(AMQPActor):
             if actor not in monitoredClients:
                 monitoredClients.append(actor)
 
-        self.client = AMQPClient('alerts', host='localhost', port=5672,
-                                 models=monitoredClients)
+        self.client = AMQPClient('alerts', models=monitoredClients)
         await self.client.start()
 
         for key, value in self.callbacks.datamodel_callbacks.items():
@@ -81,11 +80,16 @@ class alertsActor(AMQPActor):
         for a in self.disabledAlerts:
             await a.dispatchAlertMessage()
 
+    async def broadcastAll(self):
+        await self.broadcastActive()
+        await self.broadcastDisabled()
+
     async def broadcastInstruments(self):
         for name, down in self.instrumentDown:
+            instName = instrumentStatus + name.capitalize()
             self.write(message_code="i",
-                       message={"instrumentStatus": {"name": name,
-                                                     "disabled": down}})
+                       message={instName: {"name": name,
+                                           "disabled": down}})
 
     @property
     def hubModel(self):
@@ -139,6 +143,7 @@ class keyState(object):
         self.emailAddresses = emailAddresses
         self.emailSent = False
         self.smtpclient = alertsActor.config["email"]["mailClient"]
+        self._keyFormat = None
 
         # kwargs, second argument is the default
         self.defaultSeverity = kwargs.get("severity", "info")
@@ -151,7 +156,14 @@ class keyState(object):
 
         assert self.severity in ['ok', 'info', 'apogeediskwarn', 'warn', 'serious', 'critical'], "severity level not allowed"
 
-    def keywordFmt(self):
+    @property
+    def camelCase(self):
+        if self._camelCase is None:
+            pieces = self.keyword.split(".")
+            self._camelCase = "".join([p.capitalize() for p in pieces])
+        return self._camelCase
+
+    def formatOutput(self):
         if "heartbeat" in self.actorKey:
             instring = "at {time}; last seen {diff} sec ago".format(time=self.triggeredTime,
                                                                     diff=int(time.time()-self.lastalive))
@@ -161,17 +173,17 @@ class keyState(object):
                                                                     keyword=parseKey(self.keyword))
         else:
             instring = 'at {time}; found {keyword}'.format(keyword=parseKey(self.keyword), time=self.triggeredTime)
-        return qstr(instring)
+        return instring
 
     @property
     def msg(self):
         # return "alert={actorKey}, {severity}, {value}, {enable}, {acknowledged}, {acknowledger}".format(
-        #        actorKey=self.actorKey, value=self.keywordFmt(),
+        #        actorKey=self.actorKey, value=self.formatOutput(),
         #        severity=self.severity, enable=enabled(self.disabled), acknowledged=ack(self.acknowledged),
         #        acknowledger=self.acknowledger)
 
         formatted = {"keyword": self.actorKey,
-                     "value": self.keywordFmt(),
+                     "value": self.formatOutput(),
                      "timeStamp": self.triggeredTime,
                      "severity": self.severity,
                      "disabled": self.disabled,
@@ -302,7 +314,7 @@ class keyState(object):
             broadcastSeverity = 'i'
 
         await self.alertsActorReference.write(message_code=broadcastSeverity,
-                                              message={"alert": self.msg})
+                                              message={"alert" + self.camelCase: self.msg})
 
         log.info("ALERT! " + self.msg)
 
