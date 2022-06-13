@@ -1,19 +1,62 @@
-# encoding: utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
-# conftest.py
-#
+
+import os
+import pathlib
+
+import pytest
+
+from clu import AMQPClient, command_parser
+
+from alertsActor.tools import Timer
+
+DATA_DIR = pathlib.Path(os.path.dirname(__file__)) / "data"
 
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
+@command_parser.command()
+@click.argument('keyword', type=str)
+@click.argument('value', type=int)
+def modify_state_int(command, keyword, value):
+	actor = command.actor
+	actor.state[keyword] = value
+    command.finish()
+
+@command_parser.command()
+@click.argument('keyword', type=str)
+@click.argument('value', type=str)
+def modify_state_str(command, keyword, value):
+	actor = command.actor
+	actor.state[keyword] = value
+    command.finish()
 
 
-"""
-Here you can add fixtures that will be used for all the tests in this
-directory. You can also add conftest.py files in underlying subdirectories.
-Those conftest.py will only be applies to the tests in that subdirectory and
-underlying directories. See https://docs.pytest.org/en/2.7.3/plugins.html for
-more information.
-"""
+class TestActor(AMQPActor):
+    def __init__(self, **kwargs):
+        super().__init__(name='test_actor',
+                         schema=DATA_DIR / "schema.json",
+                         **kwargs)
+
+        self.state = dict()
+        self.timer = Timer()
+
+        self.timer.start(1, self.writeStatus)
+
+    def writeStatus(self):
+    	for keyword, value in self.state.items():
+	    	self.write(message_code="i",
+                       message={keyword: value})
+	    self.timer.start(1, self.writeStatus)
+
+
+@pytest.fixture
+async def test_actor(rabbitmq, event_loop):
+
+    port = rabbitmq.args["port"]
+
+    actor = TestActor(port=port)
+    await actor.start()
+
+    yield actor
+
+    await actor.stop()

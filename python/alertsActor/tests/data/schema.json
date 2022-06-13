@@ -1,0 +1,7 @@
+{
+  "type": "object",
+  "properties": {
+    "isPositive": { "type": "number" },
+    "additionalProperties": false
+  }
+}
