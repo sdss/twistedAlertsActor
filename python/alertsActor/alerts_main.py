@@ -10,7 +10,7 @@ from clu.actor import AMQPActor
 from clu.client import AMQPClient
 
 from alertsActor import __version__, alertActions
-import alertsActor.cmds.parser as alerts_parser
+from alertsActor.cmds import parser as alerts_parser
 from alertsActor import log
 from alertsActor.rules import callbackWrapper, mail, dangerKey
 from alertsActor.tools import Timer, wrapBlocking
@@ -36,6 +36,7 @@ class alertsActor(AMQPActor):
         # keep track of heartbeats
         self.heartbeats = dict()
 
+    async def start(self):
         self.callbacks = callbackWrapper.wrapCallbacks(self, alertActions)
 
         monitoredClients = list()
@@ -50,6 +51,8 @@ class alertsActor(AMQPActor):
         for key, value in self.callbacks.datamodel_callbacks.items():
             actor, keyword = key.split(".")
             self.client[actor][keyword].register_callback(value)
+
+        await super().start()
 
     async def addKey(self, key, severity, **kwargs):
         self.monitoring[key] = keyState(self, actorKey=key, severity=severity, **kwargs)
@@ -206,7 +209,7 @@ class keyState(object):
     def stampTime(self):
         self.triggeredTime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
 
-    def setActive(self, severity=None):
+    async def setActive(self, severity=None):
         # something cause a problem, do stuff
         self.acknowledged = False  # clear anything from old alert
         self.active = True
@@ -262,7 +265,7 @@ class keyState(object):
         # possibly send email? Or only send email for critical? Or...
         # if self.alertsActorReference.hub.didFail:
         #     self.alertsActorReference.reconnect()
-        await check = self.checkKey()
+        check = await self.checkKey()
         print("evaluated {} found {} default {}".format(self.actorKey, check, self.defaultSeverity))
         if check != self.severity:
             # something changed, treat it like new alert

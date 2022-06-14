@@ -10,11 +10,9 @@ from alertsActor.cmds import parser
 
 
 @parser.command()
-@click.argument('instrument', type=str, default=None, required=True,
-                help="Which instrument to modify")
+@click.argument('instrument', type=str, default=None, required=True)
 @click.argument('state', default='up', required=True,
-                type=click.Choice(['up', 'down']),
-                help="State to set ('up' or 'down')")
+                type=click.Choice(['up', 'down']))
 @click.option('-u', '--user', type=str, default=None,
               help='user unacknowledging alert')
 async def instrumentState(command, instrument=None, state="up", user=None):

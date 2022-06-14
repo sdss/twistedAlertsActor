@@ -9,8 +9,7 @@ from alertsActor.cmds import parser
 
 
 @parser.command()
-@click.argument('alertkey', type=str, required=True,
-                help='alert to disable')
+@click.argument('alertkey', type=str, required=True)
 async def enable(command, alertkey=None):
     """enable an alert"""
 

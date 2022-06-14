@@ -10,8 +10,7 @@ from alertsActor.cmds import parser
 
 
 @parser.command()
-@click.argument('alertkey', type=str, required=True,
-                help='alert to disable')
+@click.argument('alertkey', type=str, required=True)
 @click.argument('severity', required=True, default='info',
                 type=click.Choice(['ok', 'info', 'apogeediskwarn', 'warn',
                                    'serious', 'critical']))

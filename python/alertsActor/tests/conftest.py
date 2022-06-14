@@ -4,10 +4,11 @@
 
 import os
 import pathlib
+import click
 
 import pytest
 
-from clu import AMQPClient, command_parser
+from clu import AMQPActor, command_parser
 
 from alertsActor.tools import Timer
 
@@ -18,16 +19,16 @@ DATA_DIR = pathlib.Path(os.path.dirname(__file__)) / "data"
 @click.argument('keyword', type=str)
 @click.argument('value', type=int)
 def modify_state_int(command, keyword, value):
-	actor = command.actor
-	actor.state[keyword] = value
+    actor = command.actor
+    actor.state[keyword] = value
     command.finish()
 
 @command_parser.command()
 @click.argument('keyword', type=str)
 @click.argument('value', type=str)
 def modify_state_str(command, keyword, value):
-	actor = command.actor
-	actor.state[keyword] = value
+    actor = command.actor
+    actor.state[keyword] = value
     command.finish()
 
 
@@ -43,10 +44,10 @@ class TestActor(AMQPActor):
         self.timer.start(1, self.writeStatus)
 
     def writeStatus(self):
-    	for keyword, value in self.state.items():
-	    	self.write(message_code="i",
+        for keyword, value in self.state.items():
+            self.write(message_code="i",
                        message={keyword: value})
-	    self.timer.start(1, self.writeStatus)
+        self.timer.start(1, self.writeStatus)
 
 
 @pytest.fixture
