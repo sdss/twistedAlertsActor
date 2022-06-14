@@ -16,11 +16,12 @@ class wrapCallbacks(object):
        along with their alert type.
     """
 
-    def __init__(self, alertsActor, keywords):
-        # keywords read from config
+    def __init__(self, alertsActor):
         self.alertsActor = alertsActor
         # self.datamodel_casts = dict()
         self.datamodel_callbacks = dict()
+
+    async def assignCallbacks(self, keywords):
 
         for key, actions in keywords.items():
             # self.datamodel_casts[key] = actions['cast']

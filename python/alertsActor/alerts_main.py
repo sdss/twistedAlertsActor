@@ -36,9 +36,12 @@ class alertsActor(AMQPActor):
         # keep track of heartbeats
         self.heartbeats = dict()
 
-    async def start(self):
-        self.callbacks = callbackWrapper.wrapCallbacks(self, alertActions)
+        self.callbacks = callbackWrapper.wrapCallbacks(self)
 
+    async def start(self):
+        
+        self.callbacks.assignCallbacks(alertActions)
+        
         monitoredClients = list()
         for key in self.callbacks.datamodel_callbacks:
             actor = key.split(".")[0]
