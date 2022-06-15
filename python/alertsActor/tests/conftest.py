@@ -9,6 +9,7 @@ import click
 import pytest
 
 from clu import AMQPActor, command_parser
+from clu.testing import setup_test_actor
 
 from alertsActor.tools import Timer
 
@@ -56,8 +57,6 @@ async def test_actor(rabbitmq, event_loop):
     port = rabbitmq.args["port"]
 
     actor = TestActor(port=port)
-    await actor.start()
+    await setup_test_actor(actor)
 
     yield actor
-
-    await actor.stop()
