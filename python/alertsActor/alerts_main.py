@@ -5,11 +5,12 @@
 #
 
 import time
+import yaml
 
 from clu.actor import AMQPActor
 from clu.client import AMQPClient
 
-from alertsActor import __version__, alertActions
+from alertsActor import __version__, alertActions, config
 from alertsActor.cmds import parser as alerts_parser
 from alertsActor import log
 from alertsActor.rules import callbackWrapper, mail, dangerKey
@@ -21,9 +22,9 @@ class alertsActor(AMQPActor):
 
     parser = alerts_parser
 
-    def __init__(self, **kwargs):
+    def __init__(self, actionsFile=None, **kwargs):
 
-        super().__init__(**kwargs)
+        super().__init__(name="alertsActor", **kwargs)
 
         # a dictionary of actor keys we're watching
         self.monitoring = dict()
@@ -38,22 +39,45 @@ class alertsActor(AMQPActor):
 
         self.callbacks = callbackWrapper.wrapCallbacks(self)
 
-    async def start(self):
+        # actionsFile = kwargs.get("actionsFile", None)
+        if actionsFile is not None:
+            # mostly for testing
+            try:
+                alertActions = yaml.load(open(actionsFile), Loader=yaml.UnsafeLoader)
+            except AttributeError:
+                alertActions = yaml.load(open(actionsFile))
+
+        self.alertActions = alertActions
+
+    async def setupCallbacks(self):
+        """create callbacks, seperate from start because testing overrides start"""
+        await self.callbacks.assignCallbacks(self.alertActions)
+        print("callbacks!")
         
-        self.callbacks.assignCallbacks(alertActions)
-        
-        monitoredClients = list()
+        monitoredActors = list()
         for key in self.callbacks.datamodel_callbacks:
+            print(key)
             actor = key.split(".")[0]
             if actor not in monitoredClients:
-                monitoredClients.append(actor)
+                monitoredActors.append(actor)
 
-        self.client = AMQPClient('alerts', models=monitoredClients)
+        print(f"monitoredClients {monitoredActors}")
+        self.client = AMQPClient('alerts', models=monitoredActors)
         await self.client.start()
+
+        for m in monitoredActors:
+            cmd = await self.client.send_command(m, "ping")
+            await cmd
+            print(m, cmd.status)
+        print(f"CLIENT {self.client}")
 
         for key, value in self.callbacks.datamodel_callbacks.items():
             actor, keyword = key.split(".")
-            self.client[actor][keyword].register_callback(value)
+            print("MODELS", self.client.models)
+            self.client.models[actor][keyword].register_callback(value)
+
+    async def start(self):
+        await self.setupCallbacks()
 
         await super().start()
 
@@ -148,7 +172,7 @@ class keyState(object):
         self.emailTimer = Timer()
         self.emailAddresses = emailAddresses
         self.emailSent = False
-        self.smtpclient = alertsActor.config["email"]["mailClient"]
+        self.smtpclient = config["email"]["mailClient"]
         self._keyFormat = None
 
         # kwargs, second argument is the default

@@ -12,7 +12,7 @@ from alertsActor.cmds import parser
 @click.argument('alertkey', type=str, required=True)
 @click.option('-u', '--user', type=str, default=None,
               help='user disabling this alert')
-async def disable(command, alertkey=None, user=None):
+async def disable(command, alertkey, user=None):
     """disable an alert"""
 
     if user is None:

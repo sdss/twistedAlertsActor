@@ -71,7 +71,7 @@ class wrapCallbacks(object):
 
             if "instruments" in actions.keys():
                 for i in actions["instruments"]:
-                    alertsActor.instrumentDown[i] = False
+                    self.alertsActor.instrumentDown[i] = False
 
     async def pulse(self, alertKey='NOT_SPECIFIED', checkAfter=30):
         """Update the heartbeat for a specified actor.

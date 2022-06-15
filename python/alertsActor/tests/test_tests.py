@@ -11,9 +11,9 @@ import pytest
 pytestmark = [pytest.mark.asyncio]
 
 
-async def test_test_actor(test_actor):
+async def test_test_actor(test_actor, test_client):
 
-    command = await test_actor.invoke_mock_command("modify-state-int isPositive 5")
+    command = await test_client.send_command("test", "modify-state-int isPositive 5")
     await command
 
     assert test_actor.state["isPositive"] == 5
