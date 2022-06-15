@@ -22,6 +22,8 @@ DATA_DIR = pathlib.Path(os.path.dirname(__file__)) / "data"
 def modify_state_int(command, keyword, value):
     actor = command.actor
     actor.state[keyword] = value
+    print(keyword, value, actor.state)
+
     command.finish()
 
 @command_parser.command()
