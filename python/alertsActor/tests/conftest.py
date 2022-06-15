@@ -11,7 +11,7 @@ import pytest_asyncio
 from clu import AMQPActor, AMQPClient
 from clu.testing import setup_test_actor
 
-from clu.parsers.click import CluGroup, ping
+from clu.parsers.click import CluGroup, get_schema, help_, keyword, ping, version
 
 from alertsActor.tools import Timer
 
@@ -23,6 +23,10 @@ def parser(*args):
     pass
 
 parser.add_command(ping)
+parser.add_command(version)
+parser.add_command(help_)
+parser.add_command(get_schema)
+parser.add_command(keyword)
 
 @parser.command()
 @click.argument('keyword', type=str)

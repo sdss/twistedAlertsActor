@@ -22,9 +22,11 @@ class alertsActor(AMQPActor):
 
     parser = alerts_parser
 
-    def __init__(self, actionsFile=None, **kwargs):
+    def __init__(self, actionsFile=None, brokerPort=5672, **kwargs):
 
         super().__init__(name="alertsActor", **kwargs)
+
+        self.brokerPort = brokerPort
 
         # a dictionary of actor keys we're watching
         self.monitoring = dict()
@@ -58,11 +60,13 @@ class alertsActor(AMQPActor):
         for key in self.callbacks.datamodel_callbacks:
             print(key)
             actor = key.split(".")[0]
-            if actor not in monitoredClients:
+            if actor not in monitoredActors:
                 monitoredActors.append(actor)
 
         print(f"monitoredClients {monitoredActors}")
-        self.client = AMQPClient('alerts', models=monitoredActors)
+        self.client = AMQPClient('alerts',
+                                 models=monitoredActors,
+                                 port=self.brokerPort)
         await self.client.start()
 
         for m in monitoredActors:
