@@ -6,7 +6,7 @@ import os
 import pathlib
 import click
 
-import pytest
+import pytest_asyncio
 
 from clu import AMQPActor
 from clu.testing import setup_test_actor
@@ -28,7 +28,6 @@ def parser(*args):
 def modify_state_int(command, keyword, value):
     actor = command.actor
     actor.state[keyword] = value
-    print(keyword, value, actor.state)
 
     command.finish()
 
@@ -60,7 +59,7 @@ class TestActor(AMQPActor):
         self.timer.start(1, self.writeStatus)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def test_actor(rabbitmq, event_loop):
 
     port = rabbitmq.args["port"]
