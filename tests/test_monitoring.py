@@ -7,6 +7,7 @@ import pathlib
 import asyncio
 
 import pytest
+import pytest_asyncio
 
 from clu.testing import setup_test_actor
 
@@ -16,17 +17,30 @@ pytestmark = [pytest.mark.asyncio]
 
 DATA_DIR = pathlib.Path(os.path.dirname(__file__)) / "data"
 
-async def test_is_positive_actor(rabbitmq, test_actor, test_client):
-
-    command = await test_client.send_command("test", "ping")
-    await command
-    print("TEST", command.status)
+@pytest_asyncio.fixture
+async def test_alerts(rabbitmq, event_loop, test_actor):
 
     port = rabbitmq.args["port"]
 
     actionsFile = DATA_DIR / "testing.yaml"
     test_alerts = alertsActor(actionsFile=actionsFile, brokerPort=port)
     await test_alerts.start()
+
+    yield test_alerts
+
+    await test_alerts.stop()
+
+async def test_is_positive_actor(rabbitmq, test_alerts, test_client):
+
+    command = await test_client.send_command("test", "ping")
+    await command
+    print("TEST", command.status)
+
+    # port = rabbitmq.args["port"]
+
+    # actionsFile = DATA_DIR / "testing.yaml"
+    # test_alerts = alertsActor(actionsFile=actionsFile, brokerPort=port)
+    # await test_alerts.start()
     # await test_alerts.setupCallbacks()
 
     command = await test_client.send_command("test", "modify-state-int isPositive 5")
@@ -39,7 +53,7 @@ async def test_is_positive_actor(rabbitmq, test_actor, test_client):
     # await command
 
     # assert "test.isPositive" in test_alerts.activeAlerts
-    await test_alerts.stop()
+    # await test_alerts.stop()
 
 
 # async def test_disable(test_actor):

@@ -9,7 +9,7 @@ import click
 from alertsActor.cmds import parser
 
 
-@parser.command()
+@parser.command("instrumentState")
 @click.argument('instrument', type=str, default=None, required=True)
 @click.argument('state', default='up', required=True,
                 type=click.Choice(['up', 'down']))
