@@ -22,11 +22,7 @@ class alertsActor(AMQPActor):
 
     parser = alerts_parser
 
-    def __init__(self, actionsFile=None, brokerPort=5672, **kwargs):
-
-        super().__init__(name="alertsActor", **kwargs)
-
-        self.brokerPort = brokerPort
+    def __init__(self, actionsFile=None, **kwargs):
 
         # a dictionary of actor keys we're watching
         self.monitoring = dict()
@@ -51,39 +47,31 @@ class alertsActor(AMQPActor):
 
         self.alertActions = alertActions
 
+        self.monitoredActors = list()
+        for key in self.alertActions:
+            actor = key.split(".")[0]
+            if actor not in self.monitoredActors:
+                self.monitoredActors.append(actor)
+
+        super().__init__(name="alertsActor",
+                         models=self.monitoredActors,
+                         **kwargs)
+
     async def setupCallbacks(self):
         """create callbacks, seperate from start because testing overrides start"""
         await self.callbacks.assignCallbacks(self.alertActions)
-        print("callbacks!")
-        
-        monitoredActors = list()
-        for key in self.callbacks.datamodel_callbacks:
-            print(key)
-            actor = key.split(".")[0]
-            if actor not in monitoredActors:
-                monitoredActors.append(actor)
 
-        print(f"monitoredClients {monitoredActors}")
-        self.client = AMQPClient('alerts',
-                                 models=monitoredActors,
-                                 port=self.brokerPort)
-        await self.client.start()
-
-        for m in monitoredActors:
-            cmd = await self.client.send_command(m, "ping")
+        for m in self.monitoredActors:
+            cmd = await self.send_command(m, "ping")
             await cmd
-            print(m, cmd.status)
-        print(f"CLIENT {self.client}")
 
         for key, value in self.callbacks.datamodel_callbacks.items():
             actor, keyword = key.split(".")
-            print("MODELS", self.client.models)
-            self.client.models[actor][keyword].register_callback(value)
+            self.models[actor][keyword].register_callback(value)
 
     async def start(self):
-        await self.setupCallbacks()
-
         await super().start()
+        await self.setupCallbacks()
 
     async def addKey(self, key, severity, **kwargs):
         self.monitoring[key] = keyState(self, actorKey=key, severity=severity, **kwargs)
