@@ -55,6 +55,7 @@ class alertsActor(AMQPActor):
 
         super().__init__(name="alertsActor",
                          models=self.monitoredActors,
+                         log=log,
                          **kwargs)
 
     async def setupCallbacks(self):
@@ -165,7 +166,7 @@ class keyState(object):
         self.emailAddresses = emailAddresses
         self.emailSent = False
         self.smtpclient = config["email"]["mailClient"]
-        self._keyFormat = None
+        self._camelCase = None
 
         # kwargs, second argument is the default
         self.defaultSeverity = kwargs.get("severity", "info")
@@ -181,7 +182,7 @@ class keyState(object):
     @property
     def camelCase(self):
         if self._camelCase is None:
-            pieces = self.keyword.split(".")
+            pieces = self.actorKey.split(".")
             self._camelCase = "".join([p.capitalize() for p in pieces])
         return self._camelCase
 
@@ -335,10 +336,10 @@ class keyState(object):
         else:
             broadcastSeverity = 'i'
 
-        await self.alertsActorReference.write(message_code=broadcastSeverity,
-                                              message={"alert" + self.camelCase: self.msg})
+        self.alertsActorReference.write(message_code=broadcastSeverity,
+                                        message={"alert" + self.camelCase: self.msg})
 
-        log.info("ALERT! " + self.msg)
+        log.info("ALERT! " + self.camelCase + " " + self.formatOutput())
 
     async def checkKey(self):
         # check key, should be called when keyword changes

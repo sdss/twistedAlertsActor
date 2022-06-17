@@ -83,13 +83,14 @@ class wrapCallbacks(object):
 
         deadCallback = self.itsDeadJim(alertKey=alertKey)
 
-        async def startTime(newKeyval):
+        async def startTime(model_property):
             # called as callback, so the updated key is passed by default
             # print('pulse: ', alertKey, newKeyval[0])
+            newKeyval = model_property.value
             log.info('{}: the actor said {}'.format(alertKey, newKeyval))
             # don't remember why we want the first element of the list here
             # but it shouldn't matter for heartbeat monitoring
-            self.alertsActor.monitoring[alertKey].keyword = newKeyval[0]
+            self.alertsActor.monitoring[alertKey].keyword = newKeyval
             self.alertsActor.monitoring[alertKey].lastalive = time.time()
             self.alertsActor.heartbeats[alertKey].start(checkAfter, deadCallback)
             await self.alertsActor.monitoring[alertKey].checkKey()
@@ -109,9 +110,8 @@ class wrapCallbacks(object):
 
         deadCallback = self.itsDeadJim(alertKey=staleKey)
 
-        def check(newKeyval, init=False):
-            if len(newKeyval) == 1:
-                newKeyval = newKeyval[0]
+        async def check(model_property, init=False):
+            newKeyval = model_property.value
             if init:
                 self.alertsActor.monitoring[staleKey].keyword = 0
             if requireChange:
@@ -123,7 +123,7 @@ class wrapCallbacks(object):
             self.alertsActor.monitoring[staleKey].keyword = newKeyval
             self.alertsActor.monitoring[staleKey].lastalive = time.time()
             self.alertsActor.heartbeats[staleKey].start(checkAfter, deadCallback)
-            self.alertsActor.monitoring[staleKey].checkKey()
+            await self.alertsActor.monitoring[staleKey].checkKey()
 
             if init:
                 return None
@@ -131,30 +131,29 @@ class wrapCallbacks(object):
             log.info('{}: the actor said {}'.format(actorKey, newKeyval))
             # called as callback, so the updated key is passed by default
             self.alertsActor.monitoring[actorKey].keyword = newKeyval
-            self.alertsActor.monitoring[actorKey].checkKey()
+            await self.alertsActor.monitoring[actorKey].checkKey()
 
-        check([-9999], init=True)
+        await check([-9999], init=True)
 
         return check
 
     def updateKey(self, actorKey):
-        def check(newKeyval):
+        async def check(model_property):
             # print("---------------------------")
             # print(newKeyval)
+            newKeyval = model_property.value
             log.info('{}: the actor said {}'.format(actorKey, newKeyval))
-            if len(newKeyval) == 1:
-                newKeyval = newKeyval[0]
             # print("{} {} {}".format(actorKey, newKeyval, type(newKeyval)))
             # called as callback, so the updated key is passed by default
             self.alertsActor.monitoring[actorKey].keyword = newKeyval
-            self.alertsActor.monitoring[actorKey].checkKey()
+            await self.alertsActor.monitoring[actorKey].checkKey()
 
         return check
 
     def itsDeadJim(self, alertKey='NOT_SPECIFIED'):
         # some actor stopped outputting a keyword, raise the alarm!
-        def setActive():
-            self.alertsActor.monitoring[alertKey].setActive()
+        async def setActive():
+            await self.alertsActor.monitoring[alertKey].setActive()
 
         return setActive
 

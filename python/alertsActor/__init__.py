@@ -2,29 +2,7 @@
 import os
 import yaml
 
-# Inits the logging system. Only shell logging, and exception and warning catching.
-# File logging can be started by calling log.start_file_logger(name).
-from .utils import get_logger
-
-# Monkeypatches formatwarning and error handling
-
-import click
-import warnings
-
-
-def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
-
-    basename = os.path.basename(filename)
-    category_colour = click.style('[{}]'.format(category.__name__), fg='yellow')
-
-    return '{}: {} ({}:{})\n'.format(category_colour, message, basename, lineno)
-
-
-warnings.formatwarning = warning_on_one_line
-
-warnings.filterwarnings(
-    'ignore', 'Matplotlib is building the font cache using fc-list. This may take a moment.')
-
+from sdsstools import get_logger
 
 log = get_logger('alerts')
 

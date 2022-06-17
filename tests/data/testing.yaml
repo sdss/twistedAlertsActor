@@ -7,4 +7,4 @@ test.isPositive:
   selfClear: True
   instruments: [test]
   dangerVal: 0
-  checker: !!python/object/new:alertsActor.rules.dangerKey.above {}
+  checker: !!python/object/new:alertsActor.rules.dangerKey.below {}
