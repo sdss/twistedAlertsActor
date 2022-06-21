@@ -8,3 +8,35 @@ test.isPositive:
   instruments: [test]
   dangerVal: 0
   checker: !!python/object/new:alertsActor.rules.dangerKey.below {}
+
+test.isNegative: 
+  cast: !!python/name:int
+  severity: critical
+  checkAfter: 1
+  emailDelay: 120
+  emailAddresses: []
+  selfClear: True
+  instruments: [test]
+  dangerVal: 0
+  checker: !!python/object/new:alertsActor.rules.dangerKey.above {}
+
+test.always: 
+  cast: !!python/name:str
+  severity: critical
+  checkAfter: 1
+  emailDelay: 120
+  emailAddresses: []
+  selfClear: True
+  instruments: [test]
+  dangerVal: "good"
+  checker: !!python/object/new:alertsActor.rules.dangerKey.neq {}
+
+test.flagged: 
+  cast: !!python/name:int
+  severity: critical
+  checkAfter: 1
+  emailDelay: 120
+  emailAddresses: []
+  selfClear: True
+  instruments: [test]
+  dangerVal: 1

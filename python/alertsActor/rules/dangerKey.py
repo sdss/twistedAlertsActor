@@ -175,12 +175,14 @@ class below(YAMLObject):
 
 
 class neq(YAMLObject):
-    """literally: is the value too low
+    """must always be
     """
     def __init__(self):
         pass
 
     def __call__(self, keyState):
+        print("CHECK, ", keyState.keyword, type(keyState.keyword))
+        print("CHECK, ", keyState.dangerVal, type(keyState.dangerVal))
         if keyState.keyword != keyState.dangerVal:
             return keyState.defaultSeverity
         else:
