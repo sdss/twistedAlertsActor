@@ -139,9 +139,9 @@ class wrapCallbacks(object):
 
     def updateKey(self, actorKey):
         async def check(model_property):
+            newKeyval = model_property.value
             # print("---------------------------")
             # print(newKeyval)
-            newKeyval = model_property.value
             log.info('{}: the actor said {}'.format(actorKey, newKeyval))
             # print("{} {} {}".format(actorKey, newKeyval, type(newKeyval)))
             # called as callback, so the updated key is passed by default

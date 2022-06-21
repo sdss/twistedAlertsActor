@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 
+import time
 import os
 import pathlib
 import asyncio
@@ -37,21 +38,15 @@ async def test_is_positive_actor(rabbitmq, test_alerts):
     command = await test_alerts.send_command("test", "modify-state-int isPositive 5")
     await command
 
-    await asyncio.sleep(2)
-
     command = await test_alerts.send_command("test", "modify-state-int isPositive 2")
     await command
-
-    await asyncio.sleep(2)
 
     assert len(test_alerts.activeAlerts) == 0
 
     command = await test_alerts.send_command("test", "modify-state-int isPositive -5")
     await command
 
-    # await asyncio.sleep(2)
-
-    assert "test.isPositive" in test_alerts.activeAlerts
+    assert "test.isPositive" in [t.actorKey for t in test_alerts.activeAlerts]
 
 
 # async def test_disable(test_actor):

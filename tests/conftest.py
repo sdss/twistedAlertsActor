@@ -22,11 +22,13 @@ DATA_DIR = pathlib.Path(os.path.dirname(__file__)) / "data"
 def parser(*args):
     pass
 
+
 parser.add_command(ping)
 parser.add_command(version)
 parser.add_command(help_)
 parser.add_command(get_schema)
 parser.add_command(keyword)
+
 
 @parser.command()
 @click.argument('keyword', type=str)
@@ -34,8 +36,10 @@ parser.add_command(keyword)
 def modify_state_int(command, keyword, value):
     actor = command.actor
     actor.state[keyword] = value
+    actor.writeStatus()
 
     command.finish()
+
 
 @parser.command()
 @click.argument('keyword', type=str)
@@ -43,11 +47,14 @@ def modify_state_int(command, keyword, value):
 def modify_state_str(command, keyword, value):
     actor = command.actor
     actor.state[keyword] = value
+    actor.writeStatus()
+
     command.finish()
 
 
 class TestActor(AMQPActor):
     parser = parser
+
     def __init__(self, **kwargs):
         super().__init__(name='test',
                          schema=DATA_DIR / "schema.json",
