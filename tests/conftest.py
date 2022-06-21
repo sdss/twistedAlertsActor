@@ -8,7 +8,7 @@ import click
 
 import pytest_asyncio
 
-from clu import AMQPActor, AMQPClient
+from clu import AMQPActor
 from clu.testing import setup_test_actor
 
 from clu.parsers.click import CluGroup, get_schema, help_, keyword, ping, version
@@ -83,16 +83,3 @@ async def test_actor(rabbitmq, event_loop):
     yield actor
 
     await actor.stop()
-
-
-@pytest_asyncio.fixture
-async def test_client(rabbitmq, event_loop):
-
-    port = rabbitmq.args["port"]
-
-    client = AMQPClient(name="test_client", port=port)
-    await client.start()
-
-    yield client
-
-    await client.stop()

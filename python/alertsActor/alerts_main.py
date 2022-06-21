@@ -53,7 +53,7 @@ class alertsActor(AMQPActor):
             if actor not in self.monitoredActors:
                 self.monitoredActors.append(actor)
 
-        super().__init__(name="alertsActor",
+        super().__init__(name="alerts",
                          models=self.monitoredActors,
                          log=log,
                          **kwargs)
@@ -90,6 +90,7 @@ class alertsActor(AMQPActor):
     def disabledAlerts(self):
         disabled = []
         for k, a in self.monitoring.items():
+            print(k, a.actorKey, a.keyword, a.disabled)
             if a.disabled:
                 disabled.append(a)
 
@@ -101,6 +102,7 @@ class alertsActor(AMQPActor):
 
     async def broadcastDisabled(self):
         for a in self.disabledAlerts:
+            print("DISABLED!!", a.camelCase, a.formatOutput)
             await a.dispatchAlertMessage()
 
     async def broadcastAll(self):
@@ -108,8 +110,8 @@ class alertsActor(AMQPActor):
         await self.broadcastDisabled()
 
     async def broadcastInstruments(self):
-        for name, down in self.instrumentDown:
-            instName = instrumentStatus + name.capitalize()
+        for name, down in self.instrumentDown.items():
+            instName = "instrumentStatus" + name.capitalize()
             self.write(message_code="i",
                        message={instName: {"name": name,
                                            "disabled": down}})
@@ -119,7 +121,7 @@ class alertsActor(AMQPActor):
         # keeps a running data model of keywords coming from the hub
         # allows callbacks on updates
 
-        return self.client.models
+        return self.models
 
 
 def ack(acknowledged):

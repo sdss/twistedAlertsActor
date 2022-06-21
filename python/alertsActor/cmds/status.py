@@ -28,19 +28,19 @@ async def status(command):
     await actor.broadcastAll()
     await actor.broadcastInstruments()
 
-    try:
-        dontClutterSDSSUser = os.getlogin()
-    except OSError:
-        # when run as a daemon, getlogin will fail
-        dontClutterSDSSUser = "sdss5"
-    if "sdss" in dontClutterSDSSUser:
-        path = "/data/logs/actors/alerts/alerts.hubModel.yaml"
-        await wrapBlocking(actor.hubModel, path)
+    # try:
+    #     dontClutterSDSSUser = os.getlogin()
+    # except OSError:
+    #     # when run as a daemon, getlogin will fail
+    #     dontClutterSDSSUser = "sdss5"
+    # if "sdss" in dontClutterSDSSUser:
+    #     path = "/data/logs/actors/alerts/alerts.hubModel.yaml"
+    #     await wrapBlocking(dumpModel, actor.hubModel, path)
 
-    # otherwise we can clutter the home directory a bit
-    # write a log of the hubModel for posterity
-    else:
-        path = "alerts.hubModel.yaml"
-        await wrapBlocking(actor.hubModel, path)
+    # # otherwise we can clutter the home directory a bit
+    # # write a log of the hubModel for posterity
+    # else:
+    #     path = "alerts.hubModel.yaml"
+    #     await wrapBlocking(dumpModel, actor.hubModel, path)
 
     return command.finish(text="Now you know all I know")
