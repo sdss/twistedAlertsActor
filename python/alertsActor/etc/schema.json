@@ -11,8 +11,8 @@
         "value": { "type": "string" },
         "timeStamp": { "type": "string" },
         "severity": { "type": "string" },
-        "disabled": { "type": "bool" },
-        "acknowledged": { "type": "bool" },
+        "disabled": { "type": "boolean" },
+        "acknowledged": { "type": "boolean" },
         "acknowledger": { "type": "string" }
       },
       "additionalProperties": false
@@ -21,7 +21,7 @@
       "type": "object",
       "properties": {
         "name": { "type": "string" },
-        "disabled": { "type": "bool" }
+        "disabled": { "type": "boolean" }
       },
       "additionalProperties": false
     }

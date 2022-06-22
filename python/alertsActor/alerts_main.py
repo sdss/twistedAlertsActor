@@ -4,6 +4,7 @@
 # alerts_main.py
 #
 
+import os
 import time
 import yaml
 
@@ -46,6 +47,12 @@ class alertsActor(AMQPActor):
                 alertActions = yaml.load(open(actionsFile))
 
         self.alertActions = alertActions
+
+        if "schema" not in kwargs:
+            kwargs["schema"] = os.path.join(
+                os.path.dirname(__file__),
+                "etc/schema.json",
+            )
 
         self.monitoredActors = list()
         for key in self.alertActions:
