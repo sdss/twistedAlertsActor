@@ -25,8 +25,8 @@ async def status(command):
 
     actor = command.actor
 
-    await actor.broadcastAll()
-    await actor.broadcastInstruments()
+    await actor.broadcastAll(command=command)
+    await actor.broadcastInstruments(command=command)
 
     # try:
     #     dontClutterSDSSUser = os.getlogin()

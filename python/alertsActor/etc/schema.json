@@ -2,13 +2,12 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {},
   "type": "object",
-  "patternProperties": {},
-  "properties": {
+  "patternProperties": {
     "alert[a-zA-Z]": {
       "type": "object",
       "properties": {
         "keyword": { "type": "string" },
-        "value": { "type": "string" },
+        "summary": { "type": "string" },
         "timeStamp": { "type": "string" },
         "severity": { "type": "string" },
         "disabled": { "type": "boolean" },
@@ -25,6 +24,9 @@
       },
       "additionalProperties": false
     }
+  },
+  "properties": {
+    "activeAlerts": {"type": "string"}
   },
   "additionalProperties": false
 }

@@ -3,12 +3,27 @@
 #
 
 
-import asyncio
+import pytest_asyncio
 
 import pytest
 
+from clu import AMQPClient
+
 
 pytestmark = [pytest.mark.asyncio]
+
+
+@pytest_asyncio.fixture
+async def test_client(rabbitmq, event_loop):
+
+    port = rabbitmq.args["port"]
+
+    client = AMQPClient(name="test_client", port=port)
+    await client.start()
+
+    yield client
+
+    await client.stop()
 
 
 async def test_test_actor(test_actor, test_client):

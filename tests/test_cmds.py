@@ -48,20 +48,14 @@ async def test_client(rabbitmq, event_loop, test_alerts):
 
 
 async def test_disable(test_client):
-    # print("\n \n MODEL \n ")
-    # print(test_client.models["alerts"], "\n \n \n")
+    cmd = await test_client.send_command('alerts', 'get_schema')
+    await cmd
+
     command = await test_client.send_command("test", "modify-state-int isPositive 5")
     await command
-    print("CMD! ", command.status)
 
     command = await test_client.send_command("alerts", "disable test.isPositive")
     await command
-    print("CMD! ", command.status)
-
-    command = await test_client.send_command("alerts", "status")
-    await command
-
-    print(test_client.models["alerts"])
 
     command = await test_client.send_command("test", "modify-state-int isPositive -5")
     await command
@@ -69,6 +63,6 @@ async def test_disable(test_client):
     command = await test_client.send_command("alerts", "status")
     await command
 
-    print(test_client.models["alerts"])
+    testItem = command.replies.get("alertTestIspositive")
 
-    # assert "test.isPositive" in [t.actorKey for t in test_alerts.activeAlerts]
+    assert testItem["disabled"]

@@ -97,31 +97,37 @@ class alertsActor(AMQPActor):
     def disabledAlerts(self):
         disabled = []
         for k, a in self.monitoring.items():
-            print(k, a.actorKey, a.keyword, a.disabled)
             if a.disabled:
                 disabled.append(a)
 
         return disabled
 
-    async def broadcastActive(self):
+    async def broadcastActive(self, command=None):
         for a in self.activeAlerts:
-            await a.dispatchAlertMessage()
+            await a.dispatchAlertMessage(command=command)
 
-    async def broadcastDisabled(self):
+    async def broadcastDisabled(self, command=None):
         for a in self.disabledAlerts:
-            print("DISABLED!!", a.camelCase, a.formatOutput)
-            await a.dispatchAlertMessage()
+            await a.dispatchAlertMessage(command=command)
 
-    async def broadcastAll(self):
-        await self.broadcastActive()
-        await self.broadcastDisabled()
+    async def broadcastAll(self, command=None):
+        await self.broadcastActive(command=command)
+        await self.broadcastDisabled(command=command)
+        active = ", ".join([str(a.actorKey) for a in self.activeAlerts])
+        self.write(message_code="i", message={"activeAlerts": active})
+        if command:
+            command.write(message_code="i", message={"activeAlerts": active})
 
-    async def broadcastInstruments(self):
+    async def broadcastInstruments(self, command=None):
         for name, down in self.instrumentDown.items():
             instName = "instrumentStatus" + name.capitalize()
             self.write(message_code="i",
                        message={instName: {"name": name,
                                            "disabled": down}})
+            if command:
+                command.write(message_code="i",
+                              message={instName: {"name": name,
+                                                  "disabled": down}})
 
     @property
     def hubModel(self):
@@ -159,7 +165,7 @@ class keyState(object):
     def __init__(self, alertsActor, actorKey='oop.forgot', keyword="",
                  emailAddresses=None, **kwargs):
         self.alertsActorReference = alertsActor
-        self.triggeredTime = None
+        self.triggeredTime = "not active"
         self.actorKey = actorKey
         self.keyword = keyword
         self.lastalive = time.time()  # updated for heartbeats
@@ -215,7 +221,7 @@ class keyState(object):
         #        acknowledger=self.acknowledger)
 
         formatted = {"keyword": self.actorKey,
-                     "value": self.formatOutput(),
+                     "summary": self.formatOutput(),
                      "timeStamp": self.triggeredTime,
                      "severity": self.severity,
                      "disabled": self.disabled,
@@ -266,7 +272,7 @@ class keyState(object):
         self.emailTimer.cancel()
         self.emailTimer = Timer()
         self.severity = 'ok'
-        self.triggeredTime = None
+        self.triggeredTime = "not active"
         self.emailSent = False
 
         await self.alertsActorReference.broadcastActive()
@@ -335,7 +341,7 @@ class keyState(object):
         # sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
         self.emailSent = True
 
-    async def dispatchAlertMessage(self):
+    async def dispatchAlertMessage(self, command=None):
         # write an alert to users
 
         if self.severity == 'critical':
@@ -347,6 +353,10 @@ class keyState(object):
 
         self.alertsActorReference.write(message_code=broadcastSeverity,
                                         message={"alert" + self.camelCase: self.msg})
+
+        if command:
+            command.write(message_code=broadcastSeverity,
+                          message={"alert" + self.camelCase: self.msg})
 
         log.info("ALERT! " + self.camelCase + " " + self.formatOutput())
 
