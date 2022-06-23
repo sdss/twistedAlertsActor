@@ -66,3 +66,46 @@ async def test_disable(test_client):
     testItem = command.replies.get("alertTestIspositive")
 
     assert testItem["disabled"]
+
+    command = await test_client.send_command("alerts", "enable test.isPositive")
+    await command
+
+    command = await test_client.send_command("alerts", "status")
+    await command
+
+    testItem = command.replies.get("alertTestIspositive")
+
+    assert not testItem["disabled"]
+    assert testItem["active"]
+
+
+async def test_instrument(test_client):
+    cmd = await test_client.send_command('alerts', 'get_schema')
+    await cmd
+
+    command = await test_client.send_command("alerts", "instrumentState test down")
+    await command
+
+    command = await test_client.send_command("test", "modify-state-int isPositive -5")
+    await command
+
+    command = await test_client.send_command("alerts", "status")
+    await command
+
+    testItem = command.replies.get("alertTestIspositive")
+
+    assert testItem["disabled"]
+
+    command = await test_client.send_command("alerts", "instrumentState test up")
+    await command
+
+    command = await test_client.send_command("test", "modify-state-int isPositive -5")
+    await command
+
+    command = await test_client.send_command("alerts", "status")
+    await command
+
+    testItem = command.replies.get("alertTestIspositive")
+
+    assert not testItem["disabled"]
+    assert testItem["active"]

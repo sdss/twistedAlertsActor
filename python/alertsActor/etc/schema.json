@@ -11,6 +11,7 @@
         "timeStamp": { "type": "string" },
         "severity": { "type": "string" },
         "disabled": { "type": "boolean" },
+        "active": { "type": "boolean" },
         "acknowledged": { "type": "boolean" },
         "acknowledger": { "type": "string" }
       },

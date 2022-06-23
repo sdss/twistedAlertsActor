@@ -14,25 +14,25 @@ from alertsActor.cmds import parser
 @click.argument('state', default='up', required=True,
                 type=click.Choice(['up', 'down']))
 @click.option('-u', '--user', type=str, default=None,
-              help='user unacknowledging alert')
+              help='user setting state')
 async def instrumentState(command, instrument=None, state="up", user=None):
     """set the state of an instrument"""
+
+    actor = command.actor
 
     if user is None:
         user = ""
 
     if state == "down":
         actor.instrumentDown[instrument] = True
-        for a in actor.activeAlerts:
-            if instrument in a.instruments:
-                await a.disable(user)
+        for k, alert in actor.monitoring.items():
+            if instrument in alert.instruments:
+                await alert.disable(user)
     else:
         actor.instrumentDown[instrument] = False
-        for a in actor.disabledAlerts:
-            if not a.instDown:
-                await a.enable()
-
-    actor = command.actor
+        for k, alert in actor.monitoring.items():
+            if not alert.instDown:
+                await alert.enable()
 
     await actor.broadcastAll()
     await actor.broadcastInstruments()

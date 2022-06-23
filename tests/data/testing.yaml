@@ -4,7 +4,7 @@ test.isPositive:
   checkAfter: 1
   emailDelay: 120
   emailAddresses: []
-  selfClear: True
+  selfClear: False
   instruments: [test]
   dangerVal: 0
   checker: !!python/object/new:alertsActor.rules.dangerKey.below {}

@@ -225,6 +225,7 @@ class keyState(object):
                      "timeStamp": self.triggeredTime,
                      "severity": self.severity,
                      "disabled": self.disabled,
+                     "active": self.active,
                      "acknowledged": self.acknowledged,
                      "acknowledger": self.acknowledger}
 
