@@ -38,7 +38,7 @@ async def acknowledge(command, alertkey=None, severity='info', message=None, use
     else:
         msg = None
 
-    await keyword.acknowledge(msg=msg, acknowledgedBy=user)
+    await keyword.acknowledge(msg=msg, acknowledgedBy=user, command=command)
     await actor.broadcastAll()
 
     return command.finish()

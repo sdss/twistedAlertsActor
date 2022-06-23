@@ -280,7 +280,7 @@ class keyState(object):
         await self.alertsActorReference.broadcastDisabled()
         await self.alertsActorReference.broadcastAll()
 
-    async def acknowledge(self, msg=None, acknowledgedBy=None, unack=False):
+    async def acknowledge(self, msg=None, acknowledgedBy=None, unack=False, command=None):
         if msg is not None:
             self.acknowledgeMsg += msg + ";" # so we can add many... I guess?
 
@@ -294,7 +294,9 @@ class keyState(object):
         else:
             self.acknowledged = True
 
-        await self.dispatchAlertMessage()
+        await self.checkKey()
+
+        await self.dispatchAlertMessage(command=command)
 
     async def reevaluate(self):
         # at some point this will presumably raise alert level?

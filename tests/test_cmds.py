@@ -109,3 +109,35 @@ async def test_instrument(test_client):
 
     assert not testItem["disabled"]
     assert testItem["active"]
+
+
+async def test_acknowledge(test_client):
+    cmd = await test_client.send_command('alerts', 'get_schema')
+    await cmd
+
+    command = await test_client.send_command("test", "modify-state-int isPositive -5")
+    await command
+
+    command = await test_client.send_command("alerts", "status")
+    await command
+
+    testItem = command.replies.get("alertTestIspositive")
+
+    assert testItem["active"]
+
+    command = await test_client.send_command("test", "modify-state-int isPositive 5")
+    await command
+
+    command = await test_client.send_command("alerts", "status")
+    await command
+
+    testItem = command.replies.get("alertTestIspositive")
+
+    assert testItem["active"]
+
+    command = await test_client.send_command("alerts", "acknowledge test.isPositive critical")
+    await command
+
+    testItem = command.replies.get("alertTestIspositive")
+
+    assert not testItem["active"]
