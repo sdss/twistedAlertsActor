@@ -63,9 +63,7 @@ async def test_disable(test_client):
     command = await test_client.send_command("alerts", "status")
     await command
 
-    testItem = command.replies.get("alertTestIspositive")
-
-    assert testItem["disabled"]
+    assert test_client.models["alerts"]["alertTestIspositive"].value["disabled"]
 
     command = await test_client.send_command("alerts", "enable test.isPositive")
     await command
@@ -73,10 +71,8 @@ async def test_disable(test_client):
     command = await test_client.send_command("alerts", "status")
     await command
 
-    testItem = command.replies.get("alertTestIspositive")
-
-    assert not testItem["disabled"]
-    assert testItem["active"]
+    assert not test_client.models["alerts"]["alertTestIspositive"].value["disabled"]
+    assert test_client.models["alerts"]["alertTestIspositive"].value["active"]
 
 
 async def test_instrument(test_client):
@@ -92,9 +88,7 @@ async def test_instrument(test_client):
     command = await test_client.send_command("alerts", "status")
     await command
 
-    testItem = command.replies.get("alertTestIspositive")
-
-    assert testItem["disabled"]
+    assert test_client.models["alerts"]["alertTestIspositive"].value["disabled"]
 
     command = await test_client.send_command("alerts", "instrumentState test up")
     await command
@@ -105,10 +99,8 @@ async def test_instrument(test_client):
     command = await test_client.send_command("alerts", "status")
     await command
 
-    testItem = command.replies.get("alertTestIspositive")
-
-    assert not testItem["disabled"]
-    assert testItem["active"]
+    assert not test_client.models["alerts"]["alertTestIspositive"].value["disabled"]
+    assert test_client.models["alerts"]["alertTestIspositive"].value["active"]
 
 
 async def test_acknowledge(test_client):
@@ -121,9 +113,7 @@ async def test_acknowledge(test_client):
     command = await test_client.send_command("alerts", "status")
     await command
 
-    testItem = command.replies.get("alertTestIspositive")
-
-    assert testItem["active"]
+    assert test_client.models["alerts"]["alertTestIspositive"].value["active"]
 
     command = await test_client.send_command("test", "modify-state-int isPositive 5")
     await command
@@ -131,13 +121,9 @@ async def test_acknowledge(test_client):
     command = await test_client.send_command("alerts", "status")
     await command
 
-    testItem = command.replies.get("alertTestIspositive")
-
-    assert testItem["active"]
+    assert test_client.models["alerts"]["alertTestIspositive"].value["active"]
 
     command = await test_client.send_command("alerts", "acknowledge test.isPositive critical")
     await command
 
-    testItem = command.replies.get("alertTestIspositive")
-
-    assert not testItem["active"]
+    assert not test_client.models["alerts"]["alertTestIspositive"].value["active"]

@@ -26,7 +26,7 @@ class wrapCallbacks(object):
         for key, actions in keywords.items():
             # self.datamodel_casts[key] = actions['cast']
 
-            initKeys = ('cast', 'severity', 'heartbeat', 'stale')
+            initKeys = ('severity', 'heartbeat', 'stale')
 
             otherArgs = {k: actions[k] for k in actions.keys() if k not in initKeys}
 
@@ -63,8 +63,10 @@ class wrapCallbacks(object):
 
             else:
                 alertKey = key
+                cast = otherArgs["cast"]
                 await self.alertsActor.addKey(alertKey,
                                               severity=actions['severity'],
+                                              keyword=cast(0.0),
                                               **otherArgs)
                 callback = self.updateKey(key)
                 self.datamodel_callbacks[key] = callback
@@ -142,6 +144,7 @@ class wrapCallbacks(object):
             newKeyval = model_property.value
             # print("---------------------------")
             # print(newKeyval)
+            # print(self.alertsActor.monitoring[actorKey].msg)
             log.info('{}: the actor said {}'.format(actorKey, newKeyval))
             # print("{} {} {}".format(actorKey, newKeyval, type(newKeyval)))
             # called as callback, so the updated key is passed by default

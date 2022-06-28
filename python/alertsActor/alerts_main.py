@@ -257,7 +257,7 @@ class keyState(object):
         self.checkMe.start(self.checkAfter, self.reevaluate)
 
         if self.instDown:
-            self.disable(0)
+            self.disable()
             log.info("NO ALERT: {} instrument down, no alert!!".format(self.actorKey))
             return None
 
@@ -382,7 +382,7 @@ class keyState(object):
 
         return check
 
-    async def disable(self, disabledBy):
+    async def disable(self, disabledBy=-1):
         self.disabled = True
         self.disabledBy = disabledBy
 
