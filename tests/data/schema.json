@@ -5,6 +5,7 @@
     "isNegative": { "type": "number" },
     "always": { "type": "string" },
     "flagged": { "type": "number" },
+    "heartbeat": { "type": "number" },
     "additionalProperties": false
   }
 }

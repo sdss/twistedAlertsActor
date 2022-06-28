@@ -11,6 +11,12 @@ from alertsActor.tools import Timer
 from alertsActor import log
 
 
+class initProperty(object):
+    """a dumb property to have a value"""
+    def __init__(self, value):
+        self.value = value
+
+
 class wrapCallbacks(object):
     """Pass in keywords read from a file
        along with their alert type.
@@ -97,7 +103,8 @@ class wrapCallbacks(object):
             self.alertsActor.heartbeats[alertKey].start(checkAfter, deadCallback)
             await self.alertsActor.monitoring[alertKey].checkKey()
 
-        await startTime(["init"])  # call now so it raises error?
+        initProp = initProperty("init")
+        await startTime(initProp)  # call now so it raises error?
 
         return startTime
 
@@ -135,7 +142,8 @@ class wrapCallbacks(object):
             self.alertsActor.monitoring[actorKey].keyword = newKeyval
             await self.alertsActor.monitoring[actorKey].checkKey()
 
-        await check([-9999], init=True)
+        initProp = initProperty(-9999)
+        await check(initProp, init=True)
 
         return check
 

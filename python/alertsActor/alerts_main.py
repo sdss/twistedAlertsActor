@@ -111,8 +111,12 @@ class alertsActor(AMQPActor):
             await a.dispatchAlertMessage(command=command)
 
     async def broadcastAll(self, command=None):
-        await self.broadcastActive(command=command)
-        await self.broadcastDisabled(command=command)
+        # await self.broadcastActive(command=command)
+        # await self.broadcastDisabled(command=command)
+
+        for k, a in self.monitoring.items():
+            await a.dispatchAlertMessage(command=command)
+
         active = ", ".join([str(a.actorKey) for a in self.activeAlerts])
         self.write(message_code="i", message={"activeAlerts": active})
         if command:
@@ -361,7 +365,8 @@ class keyState(object):
             command.write(message_code=broadcastSeverity,
                           message={"alert" + self.camelCase: self.msg})
 
-        log.info("ALERT! " + self.camelCase + " " + self.formatOutput())
+        if self.active:
+            log.info("ALERT! " + self.camelCase + " " + self.formatOutput())
 
     async def checkKey(self):
         # check key, should be called when keyword changes

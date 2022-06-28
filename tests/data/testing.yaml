@@ -40,3 +40,13 @@ test.flagged:
   selfClear: True
   instruments: [test]
   dangerVal: 1
+
+test.heartbeat: 
+  cast: !!python/name:str
+  severity: critical
+  heartbeat: test
+  checkAfter: 5
+  emailAddresses: []
+  selfClear: True
+  instruments: [test]
+  checker: !!python/object/new:alertsActor.rules.dangerKey.heartbeatCheck {}
