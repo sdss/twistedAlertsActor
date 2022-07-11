@@ -55,7 +55,7 @@ async def test_disable(test_client):
     command = await test_client.send_command("test", "modify-state-int heartbeat 0")
     await command
 
-    await wrapBlocking(time.sleep, 7)
+    await wrapBlocking(time.sleep, 3)
 
     command = await test_client.send_command("alerts", "status")
     await command

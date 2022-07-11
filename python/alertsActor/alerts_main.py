@@ -267,15 +267,15 @@ class keyState(object):
 
         await self.dispatchAlertMessage()
         # give the alert a chance to clear before emailing everyone
-        self.emailTimer.start(self.emailDelay, self.sendEmail)
+        await self.emailTimer.start(self.emailDelay, self.sendEmail)
 
     async def clear(self):
         # everything good, back to normal
         self.active = False
-        self.checkMe.cancel()
-        self.checkMe = Timer()
-        self.emailTimer.cancel()
-        self.emailTimer = Timer()
+        await self.checkMe.cancel()
+        # self.checkMe = Timer()
+        await self.emailTimer.cancel()
+        # self.emailTimer = Timer()
         self.severity = 'ok'
         self.triggeredTime = "not active"
         self.emailSent = False

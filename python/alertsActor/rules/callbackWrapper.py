@@ -100,7 +100,7 @@ class wrapCallbacks(object):
             # but it shouldn't matter for heartbeat monitoring
             self.alertsActor.monitoring[alertKey].keyword = newKeyval
             self.alertsActor.monitoring[alertKey].lastalive = time.time()
-            self.alertsActor.heartbeats[alertKey].start(checkAfter, deadCallback)
+            await self.alertsActor.heartbeats[alertKey].start(checkAfter, deadCallback)
             await self.alertsActor.monitoring[alertKey].checkKey()
 
         initProp = initProperty("init")

@@ -45,7 +45,7 @@ test.heartbeat:
   cast: !!python/name:str
   severity: critical
   heartbeat: test
-  checkAfter: 5
+  checkAfter: 2
   emailAddresses: []
   selfClear: True
   instruments: [test]

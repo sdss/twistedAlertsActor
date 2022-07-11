@@ -1,5 +1,6 @@
 import asyncio
 from functools import partial
+from contextlib import suppress
 
 
 async def wrapBlocking(func, *args, **kwargs):
@@ -20,11 +21,11 @@ class Timer:
         self._loop = asyncio.get_event_loop()
         self._task = None
 
-    def start(self, timeout, callback):
+    async def start(self, timeout, callback):
         self._timeout = timeout
         self._callback = callback
 
-        self.reset()
+        await self.reset()
 
     async def _job(self):
         await asyncio.sleep(self._timeout)
@@ -33,14 +34,16 @@ class Timer:
         except TypeError:  # Happens when the callback becomes None during an error.
             pass
 
-    def cancel(self):
+    async def cancel(self):
         """Cancel the timer."""
 
         if self._task:
             self._task.cancel()
+            with suppress(asyncio.CancelledError):
+                await self._task
 
-    def reset(self):
+    async def reset(self):
         """Reset the count."""
 
-        self.cancel()
+        await self.cancel()
         self._task = self._loop.create_task(self._job())
