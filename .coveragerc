@@ -4,5 +4,3 @@ branch = true
 [report]
 omit =
     python/alertsActor/etc/*
-    python/alertsActor/misc/*
-    python/alertsActor/tests/*
