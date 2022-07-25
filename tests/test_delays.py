@@ -48,7 +48,7 @@ async def test_client(rabbitmq, event_loop, test_alerts):
     await client.stop()
 
 
-async def test_disable(test_client):
+async def test_heartbeat(test_client):
     cmd = await test_client.send_command('alerts', 'get_schema')
     await cmd
 
@@ -82,39 +82,39 @@ async def test_disable(test_client):
     assert not test_client.models["alerts"]["alertTestHeartbeat"].value["active"]
 
 
-# async def test_stale(test_client):
-#     cmd = await test_client.send_command('alerts', 'get_schema')
-#     await cmd
+async def test_stale(test_client):
+    cmd = await test_client.send_command('alerts', 'get_schema')
+    await cmd
 
-#     command = await test_client.send_command("test", "modify-state-int goesStale 2")
-#     await command
+    command = await test_client.send_command("test", "modify-state-int goesStale 2")
+    await command
 
-#     # wait short time and output keyword to test normal, non-dead behavior
-#     await wrapBlocking(time.sleep, 0.5)
+    # wait short time and output keyword to test normal, non-dead behavior
+    await wrapBlocking(time.sleep, 0.5)
 
-#     command = await test_client.send_command("test", "modify-state-int goesStale 3")
-#     await command
+    command = await test_client.send_command("test", "modify-state-int goesStale 3")
+    await command
 
-#     command = await test_client.send_command("alerts", "status")
-#     await command
+    command = await test_client.send_command("alerts", "status")
+    await command
 
-#     assert not test_client.models["alerts"]["alertTestGoesStale"].value["active"]
+    assert not test_client.models["alerts"]["alertTestGoesStaleStale"].value["active"]
 
-#     for i in range(3):
-#         await wrapBlocking(time.sleep, 1)
+    for i in range(3):
+        await wrapBlocking(time.sleep, 1)
 
-#         command = await test_client.send_command("test", "modify-state-int goesStale 3")
-#         await command
+        command = await test_client.send_command("test", "modify-state-int goesStale 3")
+        await command
 
-#     command = await test_client.send_command("alerts", "status")
-#     await command
+    command = await test_client.send_command("alerts", "status")
+    await command
 
-#     assert test_client.models["alerts"]["alertTestGoesStale"].value["active"]
+    assert test_client.models["alerts"]["alertTestGoesStaleStale"].value["active"]
 
-#     command = await test_client.send_command("test", "modify-state-int goesStale 2")
-#     await command
+    command = await test_client.send_command("test", "modify-state-int goesStale 2")
+    await command
 
-#     command = await test_client.send_command("alerts", "status")
-#     await command
+    command = await test_client.send_command("alerts", "status")
+    await command
 
-#     assert not test_client.models["alerts"]["alertTestGoesStale"].value["active"]
+    assert not test_client.models["alerts"]["alertTestGoesStaleStale"].value["active"]

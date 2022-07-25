@@ -6,6 +6,7 @@
     "always": { "type": "string" },
     "flagged": { "type": "number" },
     "heartbeat": { "type": "number" },
+    "goesStale": {"type": "number" },
     "additionalProperties": false
   }
 }

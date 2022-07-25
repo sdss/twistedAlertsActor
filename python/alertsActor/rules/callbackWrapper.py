@@ -131,7 +131,7 @@ class wrapCallbacks(object):
             # also do the heartbeat
             self.alertsActor.monitoring[staleKey].keyword = newKeyval
             self.alertsActor.monitoring[staleKey].lastalive = time.time()
-            self.alertsActor.heartbeats[staleKey].start(checkAfter, deadCallback)
+            await self.alertsActor.heartbeats[staleKey].start(checkAfter, deadCallback)
             await self.alertsActor.monitoring[staleKey].checkKey()
 
             if init:
