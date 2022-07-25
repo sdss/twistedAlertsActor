@@ -114,6 +114,19 @@ async def test_acknowledge(test_client):
 
     assert test_client.models["alerts"]["alertTestIspositive"].value["active"]
 
+    # ack and unack just to check and for coverage
+    command = await test_client.send_command("alerts", "acknowledge test.isPositive critical")
+    await command
+
+    assert test_client.models["alerts"]["alertTestIspositive"].value["acknowledged"]
+
+    command = await test_client.send_command("alerts", "unacknowledge test.isPositive critical")
+    await command
+
+    assert not test_client.models["alerts"]["alertTestIspositive"].value["acknowledged"]
+
+    # that was fun, back to useful stuff
+
     command = await test_client.send_command("test", "modify-state-int isPositive 5")
     await command
 
@@ -121,6 +134,11 @@ async def test_acknowledge(test_client):
     await command
 
     assert test_client.models["alerts"]["alertTestIspositive"].value["active"]
+
+    command = await test_client.send_command("alerts", "acknowledge test.isPositive serious")
+    await command
+
+    assert command.status.did_fail
 
     command = await test_client.send_command("alerts", "acknowledge test.isPositive critical")
     await command

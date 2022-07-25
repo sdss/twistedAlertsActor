@@ -79,6 +79,7 @@ async def test_is_always_actor(test_alerts):
 
 
 async def test_is_flagged_actor(test_alerts):
+    # tests default checker
 
     command = await test_alerts.send_command("test", "modify-state-int flagged 0")
     await command

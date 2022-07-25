@@ -50,3 +50,16 @@ test.heartbeat:
   selfClear: True
   instruments: [test]
   checker: !!python/object/new:alertsActor.rules.dangerKey.heartbeatCheck {}
+
+# test.goesStale:
+#   cast: !!python/name:int
+#   severity: critical
+#   checkAfter: 1
+#   emailDelay: 120
+#   emailAddresses: []
+#   selfClear: True
+#   instruments: [test]
+#   stale: 2
+#   requireChange: True
+#   dangerVal: 0
+#   checker: !!python/object/new:alertsActor.rules.dangerKey.above {}

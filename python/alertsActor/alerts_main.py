@@ -258,10 +258,10 @@ class keyState(object):
         else:
             self.severity = severity
         self.stampTime()
-        self.checkMe.start(self.checkAfter, self.reevaluate)
+        await self.checkMe.start(self.checkAfter, self.reevaluate)
 
         if self.instDown:
-            self.disable()
+            await self.disable()
             log.info("NO ALERT: {} instrument down, no alert!!".format(self.actorKey))
             return None
 
@@ -319,15 +319,15 @@ class keyState(object):
 
         if self.acknowledged:
             # keep checking myself until I go away
-            self.checkMe.start(self.checkAfter, self.reevaluate)
+            await self.checkMe.start(self.checkAfter, self.reevaluate)
             return
 
         if self.disabled:
-            self.checkMe.start(self.checkAfter, self.reevaluate)
+            await self.checkMe.start(self.checkAfter, self.reevaluate)
             return
 
         await self.dispatchAlertMessage()
-        self.checkMe.start(self.checkAfter, self.reevaluate)
+        await self.checkMe.start(self.checkAfter, self.reevaluate)
 
     async def sendEmail(self):
         # notify over email

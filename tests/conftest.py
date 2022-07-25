@@ -61,15 +61,15 @@ class TestActor(AMQPActor):
                          **kwargs)
 
         self.state = dict()
-        self.timer = Timer()
+        # self.timer = Timer()
 
-        self.timer.start(1, self.writeStatus)
+        # self.timer.start(1, self.writeStatus)
 
     def writeStatus(self):
         for keyword, value in self.state.items():
             self.write(message_code="i",
                        message={keyword: value})
-        self.timer.start(1, self.writeStatus)
+        # await self.timer.start(1, self.writeStatus)
 
 
 @pytest_asyncio.fixture

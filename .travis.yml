@@ -7,9 +7,9 @@ cache:
 sudo: false
 
 python:
-- '2.7'
-- '3.5'
-- '3.6'
+- '3.7'
+- '3.8'
+- '3.9'
 
 os:
 - linux
@@ -22,7 +22,7 @@ notifications:
 
 # repo branches to test
 branches:
-- master
+- main
 
 install:
 - pip install -U pip wheel --quiet
@@ -34,7 +34,7 @@ install:
 - python setup.py install
 
 script:
-- pytest python/alertsActor/tests --cov python/alertsActor --cov-report html
+- pytest tests --cov python/alertsActor --cov-report html
 
 after_success:
 - coveralls

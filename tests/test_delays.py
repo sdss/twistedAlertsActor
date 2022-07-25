@@ -55,9 +55,66 @@ async def test_disable(test_client):
     command = await test_client.send_command("test", "modify-state-int heartbeat 0")
     await command
 
+    # wait short time and output keyword to test normal, non-dead behavior
+    await wrapBlocking(time.sleep, 0.5)
+
+    command = await test_client.send_command("test", "modify-state-int heartbeat 0")
+    await command
+
+    command = await test_client.send_command("alerts", "status")
+    await command
+
+    assert not test_client.models["alerts"]["alertTestHeartbeat"].value["active"]
+
     await wrapBlocking(time.sleep, 3)
 
     command = await test_client.send_command("alerts", "status")
     await command
 
     assert test_client.models["alerts"]["alertTestHeartbeat"].value["active"]
+
+    command = await test_client.send_command("test", "modify-state-int heartbeat 0")
+    await command
+
+    command = await test_client.send_command("alerts", "status")
+    await command
+
+    assert not test_client.models["alerts"]["alertTestHeartbeat"].value["active"]
+
+
+# async def test_stale(test_client):
+#     cmd = await test_client.send_command('alerts', 'get_schema')
+#     await cmd
+
+#     command = await test_client.send_command("test", "modify-state-int goesStale 2")
+#     await command
+
+#     # wait short time and output keyword to test normal, non-dead behavior
+#     await wrapBlocking(time.sleep, 0.5)
+
+#     command = await test_client.send_command("test", "modify-state-int goesStale 3")
+#     await command
+
+#     command = await test_client.send_command("alerts", "status")
+#     await command
+
+#     assert not test_client.models["alerts"]["alertTestGoesStale"].value["active"]
+
+#     for i in range(3):
+#         await wrapBlocking(time.sleep, 1)
+
+#         command = await test_client.send_command("test", "modify-state-int goesStale 3")
+#         await command
+
+#     command = await test_client.send_command("alerts", "status")
+#     await command
+
+#     assert test_client.models["alerts"]["alertTestGoesStale"].value["active"]
+
+#     command = await test_client.send_command("test", "modify-state-int goesStale 2")
+#     await command
+
+#     command = await test_client.send_command("alerts", "status")
+#     await command
+
+#     assert not test_client.models["alerts"]["alertTestGoesStale"].value["active"]

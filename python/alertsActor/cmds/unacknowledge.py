@@ -29,8 +29,7 @@ async def unacknowledge(command, alertkey=None, severity='info', message=None, u
     keyword = actor.monitoring[alertkey]
 
     if keyword.severity != severity:
-        command.fail(error="Severity does not match alert severity")
-        return None
+        return command.fail(error="Severity does not match alert severity")
 
     # it seems messages can't be passed right. geez..
     if len(message) > 0:
