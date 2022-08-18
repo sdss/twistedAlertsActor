@@ -1,4 +1,5 @@
 import time
+import os
 
 import smtplib
 from email.mime.text import MIMEText
@@ -23,7 +24,9 @@ def sendEmail(keyState, mailClient):
 
     sender = recipients[0]
 
-    subject = "{} alert on {}".format(severity, keyState.actorKey)
+    observatory = os.getenv("OBSERVATORY")
+
+    subject = "{} {} alert on {}".format(observatory, severity, keyState.actorKey)
     msg = MIMEText("{}\n\n{}".format(subject, text))
 
     msg['Subject'] = subject
