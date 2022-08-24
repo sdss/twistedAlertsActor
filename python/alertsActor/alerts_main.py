@@ -330,6 +330,10 @@ class keyState(object):
         self.triggeredTime = None
         self.emailSent = False
 
+        self.disabledBy = -1
+        self.acknowledger = -1
+        self.acknowledgeMsg = ""
+
         self.alertsActorReference.broadcastActive()
         self.alertsActorReference.broadcastDisabled()
         self.alertsActorReference.broadcastAll()
