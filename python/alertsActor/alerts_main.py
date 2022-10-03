@@ -252,6 +252,7 @@ class keyState(object):
         self.emailTimer = Timer()
         self.emailAddresses = emailAddresses
         self.emailSent = False
+        self.lastMsgSent = time.time()
         # self.smtpclient = "localhost:1025"
         self.smtpclient = alertsActor.config["email"]["mailClient"]
 
@@ -364,6 +365,12 @@ class keyState(object):
             self.severity = check
             self.acknowledge(acknowledgedBy=0, unack=True)
             self.dispatchAlertMessage()
+
+        if self.instDown:
+            self.disable(0)
+            log.info("NO ALERT: {} instrument down, no alert!!".format(self.actorKey))
+            return None
+
         if not self.active:
             return
 
@@ -395,11 +402,16 @@ class keyState(object):
 
         mail.sendEmail(self, self.smtpclient)
         # and sms?
-        # sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177733196"])
+        # sms.sendSms(self)  # just a reminder for later , phoneNumbers=["+18177771177"])
         self.emailSent = True
 
     def dispatchAlertMessage(self):
         # write an alert to users
+
+        if time.time() - self.lastMsgSent < 5:
+            return
+
+        self.lastMsgSent = time.time()
 
         if self.severity == 'critical':
             broadcastSeverity = 'e'
