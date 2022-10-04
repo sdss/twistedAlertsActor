@@ -71,7 +71,7 @@ class alertsActor(BaseActor):
     def activeAlerts(self):
         active = []
         for k, a in self.monitoring.items():
-            if a.active:
+            if a.active and not a.instDown:
                 active.append(a)
 
         return active
@@ -80,7 +80,7 @@ class alertsActor(BaseActor):
     def disabledAlerts(self):
         disabled = []
         for k, a in self.monitoring.items():
-            if a.disabled:
+            if a.disabled and not a.instDown:
                 disabled.append(a)
 
         return disabled
@@ -98,7 +98,8 @@ class alertsActor(BaseActor):
 
     def broadcastAll(self):
         for a in self.activeAlerts:
-            a.dispatchAlertMessage()
+            if not a.instDown:
+                a.dispatchAlertMessage()
 
     def broadcastInstruments(self):
         instruments = list()
@@ -408,7 +409,7 @@ class keyState(object):
     def dispatchAlertMessage(self):
         # write an alert to users
 
-        if time.time() - self.lastMsgSent < 5:
+        if time.time() - self.lastMsgSent < 5 or self.instDown:
             return
 
         self.lastMsgSent = time.time()
