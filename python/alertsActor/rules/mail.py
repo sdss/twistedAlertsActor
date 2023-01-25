@@ -22,9 +22,12 @@ def sendEmail(keyState, mailClient):
 
     recipients = keyState.emailAddresses
 
-    sender = recipients[0]
-
     observatory = os.getenv("OBSERVATORY")
+
+    if observatory.lower() == "lco":
+        sender = "alerts@lco.cl"
+    else:
+        sender = recipients[0]
 
     subject = "{} {} alert on {}".format(observatory, severity, keyState.actorKey)
     msg = MIMEText("{}\n\n{}".format(subject, text))
