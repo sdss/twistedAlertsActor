@@ -25,7 +25,7 @@ def sendEmail(keyState, mailClient):
     observatory = os.getenv("OBSERVATORY")
 
     if observatory.lower() == "lco":
-        sender = "alerts@lco.cl"
+        sender = "sdss-alerts@lco.cl"
     else:
         sender = recipients[0]
 
@@ -36,7 +36,7 @@ def sendEmail(keyState, mailClient):
 
     msg['From'] = "%sAlerts (SDSS-V %s Alerts)" % (2 * (severity.capitalize(), ))
 
-    msg['Reply-to'] = sender
+    msg['Reply-to'] = recipients[0]
 
     msg['To'] = ', '.join(recipients)
 
