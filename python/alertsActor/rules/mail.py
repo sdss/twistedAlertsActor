@@ -34,7 +34,10 @@ def sendEmail(keyState, mailClient):
 
     msg['Subject'] = subject
 
-    msg['From'] = "%sAlerts (SDSS-V %s Alerts)" % (2 * (severity.capitalize(), ))
+    if observatory.lower() == "lco":
+        msg['From'] = "sdss-alerts@lco.cl"
+    else:
+        msg['From'] = "%sAlerts (SDSS-V %s Alerts)" % (2 * (severity.capitalize(), ))
 
     msg['Reply-to'] = recipients[0]
 
