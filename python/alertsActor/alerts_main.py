@@ -261,7 +261,7 @@ class keyState(object):
         self.defaultSeverity = kwargs.get("severity", "info")
         self.dangerVal = kwargs.get("dangerVal", None)
         self.selfClear = kwargs.get("selfClear", False)
-        self.instruments = kwargs.get("instruments", None)
+        self.instruments = kwargs.get("instruments", [])
         self.checkAfter = kwargs.get("checkAfter", 120)
         self.checker = kwargs.get("checker", dangerKey.default())
         self.emailDelay = kwargs.get("emailDelay", self.checkAfter)
