@@ -8,7 +8,12 @@
 import re, time
 from yaml import YAMLObject
 
+import twisted.internet.reactor
+
 from alertsActor import log
+
+
+_reactor = twisted.internet.reactor
 
 
 class diskCheck(YAMLObject):
@@ -105,21 +110,21 @@ class camCheck(YAMLObject):
             keyval = [keyval]
         if len(keyval) == 1 and keyval[0] == "None": # this is a bug somewhere upstream
             keyval = []
-        for k in keyval:
+        for i, k in enumerate(keyval):
             if re.search(r"SP[12][RB][0-3]?CCDTemp", k):
-                self.generateCamCheckAlert(k, "critical")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "critical")
             elif re.search(r"SP[12]SecondaryDewarPress", k):
-                self.generateCamCheckAlert(k, "critical")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "critical")
             elif re.search(r"SP[12](DAQ|Mech|Micro)NotTalking", k):
-                self.generateCamCheckAlert(k, "critical")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "critical")
             elif re.search(r"DACS_SET", k):
-                self.generateCamCheckAlert(k, "critical")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "critical")
             elif re.search(r"SP[12]LN2Fill", k):
-                self.generateCamCheckAlert(k, "serious")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "serious")
             elif re.search(r"SP[12](Exec|Phase)Boot", k):
-                self.generateCamCheckAlert(k, "serious")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "serious")
             else:
-                self.generateCamCheckAlert(k, "warn")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "warn")
 
         for k in self.triggered:
             if k.split(".")[-1] not in keyval:  # b/c we know its camCheck already
