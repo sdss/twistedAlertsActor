@@ -63,6 +63,8 @@ class alertsActor(BaseActor):
 
         log.info('starting alertsActor actor version={!r} in port={}'
                  .format(__version__, kwargs['userPort']))
+        
+        self.lastCmd = time.time()
 
     def addKey(self, key, severity, **kwargs):
         self.monitoring[key] = keyState(self, actorKey=key, severity=severity, **kwargs)
@@ -176,8 +178,12 @@ class alertsActor(BaseActor):
             args = [a.lower() if not "=" in a else a for a in cmd.cmdBody.split()]
             args = [a.split("=")[-1] for a in args]
             # current tron config passes user, we aren't handling that yet
-            # print("cmd", cmd.__dict__)
-            # print(args)
+            if time.time() - self.lastCmd < 2 and "status" in args:
+                # cmd.writeToUsers('w', "text='too many cmds, ignoring'")
+                cmd.setState(cmd.Done)
+                return True
+            else:
+                self.lastCmd = time.time()
             if "." in args[0]:
                 user = args[0]
                 cmd.cmdID = int(args[1])

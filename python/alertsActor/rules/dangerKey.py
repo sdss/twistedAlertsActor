@@ -58,7 +58,7 @@ class camCheck(YAMLObject):
         # NEVER GETS CALLED!!!! -_-
         pass
 
-    def generateCamCheckAlert(self, key, severity):
+    def generateCamCheckAlert(self, key, severity, n=0):
         inst = key[:3]
         side = key[3]
         key = "camCheck." + key
@@ -83,11 +83,11 @@ class camCheck(YAMLObject):
 
         if key not in self.alertsActor.monitoring:
             dumbCheck = doNothing()
-            self.alertsActor.addKey(key, severity=severity, checkAfter=120,
+            self.alertsActor.addKey(key, severity=severity, checkAfter=120+n*2,
                                     selfClear=selfClear, checker=dumbCheck,
                                     keyword="'Reported by camCheck'",
                                     instruments=instruments, emailAddresses=addresses,
-                                    emailDelay=0)
+                                    emailDelay=120)
         if self.alertsActor.monitoring[key].active:
             self.alertsActor.monitoring[key].stampTime()
         else:
@@ -112,19 +112,19 @@ class camCheck(YAMLObject):
             keyval = []
         for i, k in enumerate(keyval):
             if re.search(r"SP[12][RB][0-3]?CCDTemp", k):
-                _reactor.callLater(i, self.generateCamCheckAlert, k, "critical")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "critical", n=i)
             elif re.search(r"SP[12]SecondaryDewarPress", k):
-                _reactor.callLater(i, self.generateCamCheckAlert, k, "critical")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "critical", n=i)
             elif re.search(r"SP[12](DAQ|Mech|Micro)NotTalking", k):
-                _reactor.callLater(i, self.generateCamCheckAlert, k, "critical")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "critical", n=i)
             elif re.search(r"DACS_SET", k):
-                _reactor.callLater(i, self.generateCamCheckAlert, k, "critical")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "critical", n=i)
             elif re.search(r"SP[12]LN2Fill", k):
-                _reactor.callLater(i, self.generateCamCheckAlert, k, "serious")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "serious", n=i)
             elif re.search(r"SP[12](Exec|Phase)Boot", k):
-                _reactor.callLater(i, self.generateCamCheckAlert, k, "serious")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "serious", n=i)
             else:
-                _reactor.callLater(i, self.generateCamCheckAlert, k, "warn")
+                _reactor.callLater(i, self.generateCamCheckAlert, k, "warn", n=i)
 
         for k in self.triggered:
             if k.split(".")[-1] not in keyval:  # b/c we know its camCheck already
