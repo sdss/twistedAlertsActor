@@ -179,9 +179,9 @@ class alertsActor(BaseActor):
             args = [a.split("=")[-1] for a in args]
             # current tron config passes user, we aren't handling that yet
             if time.time() - self.lastCmd < 2 and "status" in args:
-                # cmd.writeToUsers('w', "text='too many cmds, ignoring'")
+                cmd.writeToUsers('i', "text='too many cmds, ignoring'")
                 cmd.setState(cmd.Done)
-                return True
+                return
             else:
                 self.lastCmd = time.time()
             if "." in args[0]:

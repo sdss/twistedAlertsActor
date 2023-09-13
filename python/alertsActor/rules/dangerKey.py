@@ -71,6 +71,10 @@ class camCheck(YAMLObject):
             if side in ["R", "B"]:
                 instruments.append("boss.{}.{}".format(inst, side))
 
+        for i in instruments:
+            if self.alertsActor.instrumentDown[i]:
+                return
+
         if severity in ["critical", "serious"]:
             selfClear = False
             addresses = self.emailAddresses
