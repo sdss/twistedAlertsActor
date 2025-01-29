@@ -27,7 +27,7 @@ def sendEmail(keyState, mailClient):
     if observatory.lower() == "lco":
         sender = "sdss-alerts@lco.cl"
     else:
-        sender = recipients[0]
+        sender = "sdss-alerts@apo.nmsu.edu" 
 
     subject = "{} {} alert on {}".format(observatory, severity, keyState.actorKey)
     msg = MIMEText("{}\n\n{}".format(subject, text))
